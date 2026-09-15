@@ -1,0 +1,161 @@
+---
+title: "In Class Practice - Lecture 3 - Sep 8"
+author: "Phuong Vo"
+date: today
+format:
+  html:
+    toc: true
+    number-sections: true
+execute:
+  echo: true
+---
+
+# Learning Objectives
+
+In this practice you will do:
+
+1.  Intro Git/ Github.
+2.  Git Preliminary Assignment:
+    1.  Create a repository on your Github (stat506_test_repo). Add SSH key.
+    2.  Clone the repository to your local computer using SSH path.
+    3.  Make any changes in these files: `.gitignore`, `README.md`
+    4.  Stage, commit, push those changes to the repository on Github.
+    5.  On Github site, make some more changes in the repository.
+    6.  Stage, commit, push those changes to the repo on your local computer.
+3.  Advanced topics: branches, rebasing, blame.
+4.  Continue basic practices in R (matrix, array, data frame, logicals, functions)
+5.  Announcement: Today (Sep 08) office hour is online only. Please schedule your meeting in advance using [this booking page](https://calendar.app.google/zyyyko6DQqUoRkD69).
+
+# Exercise 1: Repository for Homework 1.
+
+Create a GitHub repository, clone it locally, create a Quarto document, and include the repository link inside the document.
+
+For example: In your "Homework_1" repository folder, create a file named "hw1.qmd" with the following content:
+
+"The link to the GitHub repository of this assignment is:
+
+https://github.com/phuongov/Homework_1."
+
+# Exercise 2: Work with lists.
+
+1.  Create a list of names and room assignment. Check your result with the function `is.list()`.
+
+```{r}
+room_list <- list(room_assignment = sample(1:20, 6), 
+                  employee = c("linda",
+                                "bob",
+                                "mike",
+                                "alex",
+                                "peter",
+                                "PJ")
+                  )
+
+room_list
+
+is.list(room_list)
+```
+
+2.  Subset the first object in your list.
+
+```{r}
+room_list$room_assignment
+
+# or
+room_list[["room_assignment"]]
+```
+
+3.  Subset the value of the first object in your list.
+
+```{r}
+room_list$room_assignment[2:5]
+```
+
+4.  Print out all attributes of your list.
+
+```{r}
+attributes(room_list)
+```
+
+Every named list stores its element names as an attribute. In fact, `attributes(room_list)$names` is equivalent to `names(room_list)`
+
+You can see the structure of a list by `str()`.
+
+5.  Extract one attribute of your list.
+
+```{r}
+attr(room_list, "names")
+```
+
+6.  Add a new attribute to your list. For example, I would add "department" into my list.
+
+```{r}
+attr(room_list, "department") = c("STATS")
+str(room_list)
+```
+
+7.  Assign NULL to remove the attribute you just added in #6.
+
+```{r}
+attr(room_list, "department") = NULL
+str(room_list)
+```
+
+# Exercise 3: Work with other classes of an object.
+
+## Matrix and array
+
+1.  Matrix class: Create an matrix 2 by 6 with values are numbers from 1 to 12.
+
+```{r}
+mt = matrix(1:12, 2, 6)
+```
+
+2.  Transpose the matrix above
+
+```{r}
+dim(mt) = c(6,2)
+```
+
+3.  Split the matrix into 2 array of dimension (3 x 2)
+
+```{r}
+dim(mt) = c(3,2,3)
+```
+4.  Extract the values at 2nd row, 1st collumn of the 2nd array
+
+```{r}
+mt[2, 1, 2]
+```
+
+5.  Extract the entire 2nd array as x2.
+
+```{r}
+x2 = mt[ , , 2]
+x2
+```
+
+```{r}
+x3 = mt[ , , 2, drop = FALSE]
+x3
+```
+
+
+## Data frame
+
+1.  Create a data frame of 10 rows by 5 columns which are “id”, “group”, “var1”, “var2”, “var3”.
+
+```{r}
+mydat <- data.frame(
+  id = 1:10,
+  group = c("A", "A", "A", "A", "A",
+            "B", "B", "B", "B", "B"),
+  var1 = c(10, 12, 15, 18, 20, 22, 25, 28, 30, 35),
+  var2 = c(100, 120, 110, 130, 140, 150, 145, 160, 170, 180),
+  var3 = rep(c("stat506-001", "stats506-002"), 5)
+)
+
+mydat
+```
+
+2.  Extract the first column “id”. Extract multiple columns.
+3.  Extract the first row. Extract rows for Group A.
