@@ -1,3 +1,2 @@
 # DATASCI-506
-
-This repo is created on Sept.8, 2026
+Computational Methods and Tools in Statistics
