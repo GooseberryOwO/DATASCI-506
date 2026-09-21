@@ -1,0 +1,491 @@
+---
+title: "STATS 506 — Problem Set 1"
+author: "Yuze Jin"
+date: today
+format:
+  html:
+    embed-resources: true
+    code-fold: true
+    toc: true
+execute:
+  echo: true
+---
+
+https://github.com/GooseberryOwO/DATASCI-506
+
+```{r}
+library(here)
+```
+
+# Problem 1 — Exploratory Analysis of Soybean Cultivars
+
+## a.
+
+`Season` is the growing season, `Cultivar` identifies the soybean cultivar, `Repetition` identifies the experimental repetition, `PH` is plant height, `IFP` is the height of first-pod insertion, `NLP` is the number of stems, `NGP` is the number of legumes per plant, `NGL` is the number of grains per plant, `NS` is the number of grains per pod, `MHG` is thousand-seed weight, and `GY` is grain yield.
+
+```{r}
+soybean <- read.csv(here("HW1", "Data", "data.csv"))
+
+names(soybean) <- c(
+  "season",
+  "cultivar",
+  "repetition",
+  "plant_height",
+  "first_pod_height",
+  "number_of_stems",
+  "legumes_per_plant",
+  "grains_per_plant",
+  "grains_per_pod",
+  "thousand_seed_weight",
+  "grain_yield"
+)
+
+class(soybean)
+head(soybean)
+```
+
+
+## b.
+
+```{r}
+n_observations <- nrow(soybean)
+n_cultivars <- length(unique(soybean$cultivar))
+seasons <- sort(unique(soybean$season))
+n_seasons <- length(seasons)
+
+data.frame(
+  Measure = c(
+    "Number of observations",
+    "Number of distinct cultivars",
+    "Number of seasons"
+  ),
+  Value = c(n_observations, n_cultivars, n_seasons)
+)
+
+season_counts <- as.data.frame(table(soybean$season))
+names(season_counts) <- c("Season", "Observations")
+season_counts
+```
+
+The data contain `r n_observations` observations from `r n_cultivars` distinct cultivars, collected during `r n_seasons` seasons. The season-frequency table shows 160 observations in each season.
+
+## c.
+
+### 1. What is the correlation between plant height (PH) and grain yield (GY)?
+
+```{r}
+overall_correlation <- cor(soybean$plant_height, soybean$grain_yield)
+overall_correlation
+```
+
+The correlation between plant height and grain yield is `r round(overall_correlation, 3)`. This indicates a weak positive linear association.
+
+### 2. Calculate the correlation between PH and GY separately for each season. Which season has the higher correlation?
+
+```{r}
+season_correlations <- sapply(seasons, function(season) {
+  in_season <- soybean$season == season
+  return(cor(soybean$plant_height[in_season], soybean$grain_yield[in_season]))
+})
+
+season_correlation_table <- data.frame(
+  Season = seasons,
+  Correlation = as.numeric(season_correlations)
+)
+season_correlation_table
+
+higher_correlation_season <- season_correlation_table$Season[
+  which.max(season_correlation_table$Correlation)
+]
+```
+
+The correlations are `r round(season_correlations[1], 3)` in Season 1 and `r round(season_correlations[2], 3)` in Season 2. Season `r higher_correlation_season` has the higher correlation.
+
+### 3. What is the grain yield of the observation with the greatest plant height?
+
+```{r}
+tallest_observation <- soybean[
+  which.max(soybean$plant_height),
+  c("plant_height", "grain_yield"),
+  drop = FALSE
+]
+tallest_observation
+```
+
+The greatest plant height is `r round(tallest_observation$plant_height, 2)` cm. The grain yield for that observation is `r round(tallest_observation$grain_yield, 2)`.
+
+### 4. What percentage of observations have MHG greater than the overall average MHG?
+
+```{r}
+mean_mhg <- mean(soybean$thousand_seed_weight)
+above_average_mhg <- soybean$thousand_seed_weight > mean_mhg
+n_above_average_mhg <- sum(above_average_mhg)
+percent_above_average_mhg <- mean(above_average_mhg) * 100
+
+data.frame(
+  Overall_average_MHG = mean_mhg,
+  Observations_above_average = n_above_average_mhg,
+  Percentage_above_average = percent_above_average_mhg
+)
+```
+
+The overall average MHG is `r round(mean_mhg, 2)` g. There are `r n_above_average_mhg` observations above that mean, representing `r round(percent_above_average_mhg, 2)`% of all observations.
+
+### 5. Which cultivar has the highest average grain yield?
+
+```{r}
+average_gy_by_cultivar <- tapply(
+  soybean$grain_yield,
+  soybean$cultivar,
+  mean
+)
+
+highest_yield_index <- which.max(average_gy_by_cultivar)
+highest_yield_cultivar <- data.frame(
+  Cultivar = names(average_gy_by_cultivar)[highest_yield_index],
+  Average_GY = unname(average_gy_by_cultivar[highest_yield_index])
+)
+highest_yield_cultivar
+```
+
+`r highest_yield_cultivar$Cultivar` has the highest average grain yield, with an average GY of `r round(highest_yield_cultivar$Average_GY, 2)`.
+
+## d.
+
+The requested rows are:
+
+1. One row containing the overall averages.
+2. One row for each season containing the season-specific averages.
+
+I treat `season`, `cultivar`, and `repetition` as design or identification variables, so the remaining eight variables are quantitative measurements.
+
+```{r}
+quantitative_variables <- c(
+  "plant_height", "first_pod_height", "number_of_stems",
+  "legumes_per_plant", "grains_per_plant", "grains_per_pod",
+  "thousand_seed_weight", "grain_yield"
+)
+
+overall_averages <- colMeans(soybean[quantitative_variables])
+
+season_averages <- sapply(
+  soybean[quantitative_variables],
+  function(variable) {
+    return(tapply(variable, soybean$season, mean))
+  }
+)
+rownames(season_averages) <- paste("Season", rownames(season_averages))
+
+average_table <- rbind(
+  Overall = overall_averages,
+  season_averages
+)
+average_table <- round(average_table, 2)
+average_table
+```
+
+The `Overall` row contains the averages across all 320 observations. The `Season 1` and `Season 2` rows contain the corresponding season-specific averages.
+
+## e.
+
+### 1. State the null and alternative hypotheses
+
+Let $\mu_1$ be the population mean grain yield in Season 1 and $\mu_2$ be the population mean grain yield in Season 2. The hypotheses are
+
+$$
+H_0: \mu_1 = \mu_2
+$$
+
+and
+
+$$
+H_A: \mu_1 \ne \mu_2.
+$$
+
+### 2. Present the R output and interpret the results
+
+```{r}
+season_mean_gy <- tapply(soybean$grain_yield, soybean$season, mean)
+season_sd_gy <- tapply(soybean$grain_yield, soybean$season, sd)
+
+data.frame(
+  Season = seasons,
+  Observations = as.numeric(table(soybean$season)),
+  Mean_GY = as.numeric(season_mean_gy),
+  SD_GY = as.numeric(season_sd_gy)
+)
+
+yield_t_test <- t.test(grain_yield ~ season, data = soybean)
+yield_t_test
+```
+
+The sample mean grain yields are `r round(season_mean_gy[1], 2)` in Season 1 and `r round(season_mean_gy[2], 2)` in Season 2. The test gives $t = `r round(unname(yield_t_test$statistic), 3)`$, `r round(unname(yield_t_test$parameter), 2)` degrees of freedom, and a p-value of `r round(yield_t_test$p.value, 4)`. At the 0.05 significance level, I fail to reject $H_0$. The data do not provide evidence that mean grain yield differs between the two seasons.
+
+# Problem 2 — Adult Income Dataset
+
+## a. Import the data into a data.frame
+
+```{r}
+adult <- read.csv(
+  here::here("HW1", "Data", "adult.data"),
+  header = FALSE,
+  na.strings = "?",
+  strip.white = TRUE
+)
+class(adult)
+dim(adult)
+```
+
+The file does not contain a header row, so I use `header = FALSE`. In the original data, `?` represents an unknown value; `na.strings = "?"` imports these entries as `NA`. The imported object is a `data.frame` containing 32,561 observations and 15 variables.
+
+## b. Clean and simplify the variable names
+
+```{r}
+adult_names <- c(
+  "age",
+  "workclass",
+  "fnlwgt",
+  "education",
+  "education_num",
+  "marital_status",
+  "occupation",
+  "relationship",
+  "race",
+  "sex",
+  "capital_gain",
+  "capital_loss",
+  "hours_per_week",
+  "native_country",
+  "income"
+)
+names(adult) <- adult_names
+names(adult)
+```
+
+
+## c. Examine missing values
+
+```{r}
+missing_counts <- colSums(is.na(adult))
+
+missing_table <- data.frame(
+  variable = names(missing_counts),
+  missing_observations = as.numeric(missing_counts)
+)
+
+missing_table
+```
+
+Missing values occur in three variables. `workclass` has `r unname(missing_counts["workclass"])` missing observations, `occupation` has `r unname(missing_counts["occupation"])`, and `native_country` has `r unname(missing_counts["native_country"])`. Every other variable has zero missing observations.
+
+
+## d. Restrict the sample by hours worked
+
+```{r}
+before <- nrow(adult)
+adult <- adult[adult$hours_per_week >= 10, ]
+after <- nrow(adult)
+data.frame(
+  sample = c("Before filtering", "After filtering"),
+  observations = c(before, after)
+)
+```
+
+There are `r before` samples before filtering and `r after` after filtering.
+
+## e. Remove selected missing values
+
+```{r}
+before_removal <- nrow(adult)
+required_variables <- c("occupation", "workclass", "native_country")
+
+has_complete_information <- complete.cases(adult[required_variables])
+adult <- adult[has_complete_information, ]
+after_removal <- nrow(adult)
+
+data.frame(
+  sample = c("Before removing missing values", 
+             "After removing missing values"),
+  observations = c(before_removal, after_removal)
+)
+```
+
+I removed observations with missing values for `occupation`, `workclass`, or `native_country` so the retained sample has known values for these variables. Assigning an unknown value to an existing category would not be justified. The sample size decreased from `r before_removal` to `r after_removal`.
+
+## f. Eliminate observations outside the stated criteria
+
+```{r}
+before_elimination <- nrow(adult)
+
+adult <- adult[
+  !(adult$age < 18 | adult$age > 90 | adult$education == "Preschool"),
+]
+
+after_elimination <- nrow(adult)
+
+data.frame(
+  sample = c("Before elimination", "After elimination"),
+  observations = c(before_elimination, after_elimination)
+)
+```
+
+This step removes `r before_elimination - after_elimination` observations, leaving `r after_elimination` observations.
+
+## g. Report the final sample size
+
+```{r}
+final_sample_size <- nrow(adult)
+final_sample_size
+```
+
+The final sample size is `r final_sample_size`.
+
+
+# Problem 3 - Happy Numbers
+
+## a.
+
+The function below computes one step of a happy-number sequence. It splits the positive integer into its digits, squares each digit, and returns their sum. The input check prevents nonnumeric or complex values, vectors, missing or infinite values, nonpositive values, and nonintegers.
+
+```{r}
+#' Compute the next value in a happy-number sequence
+#'
+#' @param n A single positive integer.
+#' @return A positive integer equal to the sum of the squared digits of n.
+nextHappy <- function(n) {
+  invalid_input <- (
+    !is.numeric(n) ||
+    is.complex(n) ||
+    length(n) != 1 ||
+    is.na(n) ||
+    !is.finite(n) ||
+    n <= 0 ||
+    n %% 1 != 0
+  )
+
+  if (invalid_input) {
+    stop("n must be a single positive integer.")
+  }
+
+  digits <- as.integer(strsplit(as.character(n), "")[[1]])
+  next_value <- sum(digits^2)
+
+  return(as.integer(next_value))
+}
+```
+
+The examples from the problem are reproduced below.
+
+```{r}
+nextHappy(19)
+nextHappy(82)
+```
+
+
+## b.
+
+```{r}
+#' Generate a happy-number sequence
+#'
+#' Repeatedly applies `nextHappy()` until the sequence reaches 1 or a
+#' previously observed value would be repeated.
+#'
+#' @param n A single positive integer.
+#' @return A named list with `sequence`, the generated numeric sequence, and
+#'   `isHappy`, a logical value indicating whether the sequence reaches 1.
+happySequence <- function(n) {
+  invalid_input <- (
+    !is.numeric(n) ||
+    is.complex(n) ||
+    length(n) != 1 ||
+    is.na(n) ||
+    !is.finite(n) ||
+    n <= 0 ||
+    n %% 1 != 0
+  )
+
+  if (invalid_input) {
+    stop("n must be a single positive integer.")
+  }
+
+  sequence <- n
+  current_value <- n
+
+  repeat {
+    if (current_value == 1) {
+      is_happy <- TRUE
+      break
+    }
+
+    next_value <- nextHappy(current_value)
+
+    if (next_value %in% sequence) {
+      is_happy <- FALSE
+      break
+    }
+
+    sequence <- c(sequence, next_value)
+    current_value <- next_value
+  }
+
+  result <- list(
+    sequence = sequence,
+    isHappy = is_happy
+  )
+
+  return(result)
+}
+```
+
+
+```{r}
+happySequence(19)
+happySequence(4)
+```
+
+
+## c.
+
+```{r}
+happy_sequence_lengths <- rep(NA_integer_, 1000)
+
+for (i in 1:1000) {
+  result <- happySequence(i)
+
+  if (result$isHappy) {
+    happy_sequence_lengths[i] <- length(result$sequence)
+  }
+}
+
+total_happy_numbers <- sum(!is.na(happy_sequence_lengths))
+happy_number_percentage <- total_happy_numbers / 1000 * 100
+longest_sequence_length <- max(happy_sequence_lengths, na.rm = TRUE)
+longest_start_values <- which(
+  happy_sequence_lengths == longest_sequence_length
+)
+```
+
+### a. How many are happy?
+
+```{r}
+total_happy_numbers
+```
+
+There are `r total_happy_numbers` happy numbers among the integers from 1 through 1000.
+
+### b. What percentage are happy?
+
+```{r}
+happy_number_percentage
+```
+
+The percentage of happy numbers is `r happy_number_percentage`%.
+
+### c. What starting value produces the longest happy sequence?
+
+```{r}
+longest_start_values
+longest_sequence_length
+```
+
+The longest happy sequence contains `r longest_sequence_length` values. There is a tie among `r length(longest_start_values)` starting values, shown above; the first is `r longest_start_values[1]`.
