@@ -11,11 +11,17 @@ execute:
   echo: true
 ---
 
-https://github.com/GooseberryOwO/DATASCI-506
+Repository: [https://github.com/GooseberryOwO/DATASCI-506](https://github.com/GooseberryOwO/DATASCI-506)
 
 ```{r}
 library(here)
 ```
+
+# Sources and assistance
+
+OpenAI Codex was used to help debug R code and check code style. 
+I reviewed and understand the submitted code.
+
 
 # Problem 1 — Exploratory Analysis of Soybean Cultivars
 
