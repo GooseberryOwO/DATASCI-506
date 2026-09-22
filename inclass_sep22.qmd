@@ -1,0 +1,781 @@
+# Learning Objectives
+
+In this practice you will do:
+
+1.  Continue basic practices in R: (Lecture 04) broadcasting, correlation, functional programming, (Lecture 05) debugging functions.
+2.  HW 1: due today September 22, 11:59 AM.
+3.  Quiz 1 grades posted on Canvas grade book by next class (I did not grade Question 1).
+
+# Exercise 1: Broadcasting
+
+Broadcasting: R recycling values when performing arithmetic on arrays with differing dimensions. For example:
+
+```{r}
+c(1, 2) + c(1, 2, 3, 4)
+```
+
+If they are same dimensions, they should perform point-wise.
+
+```{r}
+c(1, 2, 0 , 0) + c(1, 2, 3, 4)
+```
+
+If the total number of entries are not multiples of each other, broadcasting still works, but the results can be unexpected, so a warning is given:
+
+```{r}
+c(1, 10) + c(2, 4, 6)
+```
+
+Same thing happens if we do that on a matrix:
+
+```{r}
+m <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2)
+m
+```
+
+```{r}
+m - c(1, 2)
+```
+
+```{r}
+m - c(1, 2, 3)
+```
+
+It still works as in the “flattened” form of matrix.
+
+```{r}
+v <- as.vector(m)
+v
+```
+
+```{r}
+v * c(0, 1)
+```
+
+It recycles the shorter vector until the lengths are matched (c(0,1) is now 0 1 0 1 0 1).
+
+More examples.
+
+```{r}
+c(1, 2) * c(3, 4, 5)
+```
+
+This gives you a warning, which is a flag to check your operation.
+
+However, its not all the case that you have the warnings. With matrices, the dimension can be the multiples of each other, which mathematically works, but it might not be what you expected. For example, we want to multiply each column by 0, then 1, then 100.
+
+```{r}
+m * c(0, 1, 100) # (*) element-wise multiplication
+```
+
+R internally treats m like a vector, then the shorter vector is broadcasted (recylcled) to conduct the multiplication. Finally, the results are placed back into a matrix 2 by 3.
+
+But in fact, we supposed to complete it this way:
+
+```{r}
+t(t(m) * c(0, 1, 100))
+```
+
+The trick is that `t()` transposes a matrix, swapping rows and col, then R broadcasts (recycles) the shroter vector to conduct the multiplication. We transposed it first, to force R work on rows, then transpose it back to columns.
+
+This might not be effective. We can avoid this by set it up such that it operates on the row-wise basic. In R, there is a row-wise function `rowMeans()` that gives the mean of each row.
+
+```{r}
+apply(m, 2, mean)
+rowMeans(m)
+(m - rowMeans(m))/sd(m)
+```
+
+And if we want to do it on column-wise:
+
+```{r}
+t((t(m) - rowMeans(t(m)))/sd(t(m)))
+```
+
+Let's compare timing of those approaches:
+
+1.  First, lets create 1000 samples of 30 random observations.
+
+```{r}
+reps <- 1000 # Number of simulations
+n <- 30 # Sample size
+xmat <- matrix(rnorm(reps * n), nrow = n)
+```
+
+2.  Compute the sample variance of each sample.
+
+```{r}
+# a. use apply()
+v1 = apply(xmat, 2, var)
+
+#b use broadcasting. Hint: do sample variance = sum((x-mean(x))^2)/(n-1) on each column of the matrix.
+v2 = colSums((t(t(xmat) - colMeans(xmat)))^2)/(nrow(xmat)-1)
+```
+
+3.  Compare timing
+
+```{r}
+library(microbenchmark)
+microbenchmark(apply = apply(xmat, 2, var),
+               broadcast = colSums((t(t(xmat) - colMeans(xmat)))^2)/(nrow(xmat)-1))
+```
+
+Here `apply()` is slower because it in fact using a loop behind which is very slow, while R works with matrix much faster so broadcast is faster.
+
+# Exercise 2: Correlation coefficients
+
+What if you have a variable (for example, cancer cell), you want to get the correlation between that one variable to a bunch of other variables (for example, gene A, gene B,...)
+
+The sample correlation between $x$ and $y$ is $$r_{xy}
+=
+\frac{1}{n-1}
+\sum_{i=1}^n
+\left(\frac{x_i-\bar{x}}{s_x}\right)
+\left(\frac{y_i-\bar{y}}{s_y}\right),$$
+
+where $\bar{x}$ and $\bar{y}$ are sample means, and $s_x$ and $s_y$ are sample standard deviations.
+
+1.  First, let's create a data to do this example: `z` is the target variable (cancer cell), `xmat` contains 1000 other variables (gene A, gene B, ...)
+
+```{r}
+n <- 30 # The sample size (number of patients)
+m <- 1000 # The number of variables (gene A, gene B,...)
+r <- 0.4 # True correlation with z (cancer cell)
+z <- rnorm(n) # The first variable (gene A)
+
+xmat <- matrix(rep(z, times = m), ncol = m) # The other variables (gene B, ...)
+
+# Reduce the variance in X by the amount added from correlation with y
+xmat <- r * xmat + rnorm(n * m, sd = sqrt(1 - r^2)) # Initially xmat is as same as z, but now it is generated with noise
+```
+
+2.  Correlation between "Cancer cell" and "gene A", "gene B", "gene C",...:
+
+```{r}
+cor(z, xmat[, 1])
+cor(z, xmat[, 2])
+cor(z, xmat[, 3])
+```
+
+3.  We can compute the correlation between `z` and all of the columns in `xmat` we have by stick it into the `xmat` as another columns and compute the correlation across the combined matrix:
+
+```{r}
+wc <- cor(cbind(z, xmat))
+dim(wc)
+```
+
+We got the correlation between z and all the genes. But this is not effective because it also computed a bunch of redundance, we don't need to get the correlation between the genes.
+
+4.  Let's do second version, using loop:
+
+```{r}
+corrs <- rep(-99, m)
+for (i in seq_len(m)){
+  corrs[i] <- cor(z, xmat[, i])
+}
+wc[1,2]
+corrs[1]
+```
+
+```{r}
+microbenchmark(cor_fnt = {cor(cbind(z, xmat))},
+  forloop = {corrs <- rep(-99, m)
+  for (i in seq_len(m)){
+    corrs[i] <- cor(z, xmat[, i])
+  }
+})
+```
+
+The loop is slower, but it saves memories, might worth it.
+
+5.  Let's try the third version:
+
+```{r}
+corrs1 <- apply(xmat, 2, function(x) cor(x, z))
+all.equal(corrs, corrs1)
+```
+
+Just double check that they do it correctly.
+
+```{r}
+microbenchmark(cor_fnt = {cor(cbind(z, xmat))},
+  forloop = {corrs <- rep(-99, m)
+  for (i in seq_len(m)){
+    corrs[i] <- cor(z, xmat[, i])
+  }
+},
+apply_fnt = {apply(xmat, 2, function(x) cor(x, z))}
+)
+```
+
+Little bit faster.
+
+6.  There is another way to get this done, using linear algebra.
+
+```{r}
+rmn <- colMeans(xmat) # first get the col mean of each genes.
+rsd <- apply(xmat, 2, sd) # SD of each column
+
+# Now, let's scale it:
+xmat_c <- xmat - matrix(rep(rmn, each = n), ncol = m) # each element of xmat - mean of each column
+xmat_s <- xmat_c / matrix(rep(rsd, each = n), ncol = m) # divide by sd of each column
+
+# Now, let's standardize z as well:
+z_s <- (z - mean(z)) / sd(z)
+
+# Use dot product of standarded z and standardized xmat
+corrs2 <- z_s %*% xmat_s / (n - 1)
+corrs2 <- as.vector(corrs2)
+all.equal(corrs, corrs2)
+```
+
+```{r}
+microbenchmark(cor_fnt = {cor(cbind(z, xmat))},
+  forloop = {corrs <- rep(-99, m)
+  for (i in seq_len(m)){
+    corrs[i] <- cor(z, xmat[, i])
+  }
+  },
+  apply_fnt = {apply(xmat, 2, function(x) cor(x, z))},
+  linalg = {
+    rmn <- colMeans(xmat) 
+    rsd <- apply(xmat, 2, sd)   
+    xmat_c <- xmat - matrix(rep(rmn, each = n), ncol = m)
+    xmat_s <- xmat_c / matrix(rep(rsd, each = n), ncol = m) 
+    z_s <- (z - mean(z)) / sd(z)
+    corrs2 <- z_s %*% xmat_s / (n - 1)
+  }
+)
+```
+
+We can further eliminate the `apply()` because it is still a for loop, which slows down the operation.
+
+```{r}
+columns <- colMeans(xmat) # first get the col mean of each genes.
+cmat_c <- xmat - rep(columns, each = n) # each element of xmat - mean of each column
+
+cols_sd <- sqrt(colSums(xmat_c^2)/(n-1)) # SD of each column
+xmat_std <- xmat_c/rep(cols_sd, each = n) # standardize xmat, divide by sd of each column
+
+z_std <- (z - mean(z))/sd(z) # standardize z
+
+corrs3 <- z_std %*% xmat_std / (n - 1) # Use dot product of standardized z and standardized xmat
+corrs3 <- as.vector(corrs3)
+
+all.equal(corrs, corrs3) # Double check the result
+```
+
+```{r}
+microbenchmark(cor_fnt = {cor(cbind(z, xmat))},
+  forloop = {corrs <- rep(-99, m)
+  for (i in seq_len(m)){
+    corrs[i] <- cor(z, xmat[, i])
+  }
+  },
+  apply_fnt = {apply(xmat, 2, function(x) cor(x, z))},
+  linalg = {
+    rmn <- colMeans(xmat) 
+    rsd <- apply(xmat, 2, sd)   
+    xmat_c <- xmat - matrix(rep(rmn, each = n), ncol = m)
+    xmat_s <- xmat_c / matrix(rep(rsd, each = n), ncol = m) 
+    z_s <- (z - mean(z)) / sd(z)
+    corrs2 <- z_s %*% xmat_s / (n - 1)
+  },
+  linalg1 = {
+    columns <- colMeans(xmat) 
+  cmat_c <- xmat - rep(columns, each = n) 
+  cols_sd <- sqrt(colSums(xmat_c^2)/(n-1)) 
+  xmat_std <- xmat_c/rep(cols_sd, each = n) 
+  z_std <- (z - mean(z))/sd(z) 
+  corrs3 <- z_std %*% xmat_std / (n - 1)
+  }
+)
+```
+
+# Exercise 3: Functional programming in Monte Carlo Studies
+
+In a Monte Carlo study, we often want to repeat the same simulation procedure under different settings.
+
+Instead of rewriting our code every time, we can turn the simulation into a function and pass different settings to that function.
+
+Our goal is to gradually build a function that lets us control:
+
+- the sample size,
+
+- the distribution we simulate from,
+
+- the statistic we calculate,
+
+- and any additional parameters required by the distribution.
+
+## 1. Start with a simple simulation
+
+Suppose we generate 1,000 observations from a standard normal distribution and calculate their sample mean.
+
+```{r}
+x <- rnorm(1000)
+mean(x)
+```
+
+There are really two steps here:
+
+- Generate data using rnorm()
+
+- Calculate a statistic using mean()
+
+Now let's put these steps into a function.
+
+## 2. Write a function to compute the mean
+
+```{r}
+est_mean <- function(n) {
+  x <- rnorm(n)
+  return(mean(x))
+}
+```
+
+Now n is something we can control.
+
+```{r}
+est_mean(10)
+est_mean(100)
+est_mean(1000)
+```
+
+The structure of our simulation is now fixed, but the sample size is flexible. However, two things are still hard-coded:
+
+- rnorm
+
+- mean
+
+What if instead of the mean, we wanted the median? Or the variance?
+
+## 3. Make the statistic flexible
+
+In R, functions can be passed as arguments to other functions.
+
+So instead of hard-coding `mean()`, we can pass the desired statistical function as an argument.
+
+```{r}
+est_stat <- function(n, statFn = mean) {
+  x <- rnorm(n)
+  return(statFn(x))
+}
+```
+
+Now we can do:
+
+```{r}
+est_stat(1000, mean)
+est_stat(1000, median)
+est_stat(1000, sd)
+est_stat(1000, var)
+```
+
+Notice that we write `statFn = mean` NOT `statFn = mean()`. We are passing the function itself, not calling the function yet. Inside our function, when we call `statFn(x)` that is when R actually calls it.
+
+## 4. Make the distribution flexible too
+
+Reminder, we still have one thing hard-coded: `x <- rnorm(n)`. Why not also let the user choose the distribution?
+
+```{r}
+est_stat2 <- function(n, 
+                      distFn = rnorm, 
+                      statFn = mean) {
+  x <- distFn(n)
+  return(statFn(x))
+}
+
+est_stat2(1000, rnorm, sum)   
+est_stat2(1000, rnorm, mean)   
+```
+
+So we might naturally try:
+
+```{r}
+est_stat2(1000, rpois, sum)
+```
+
+We get error here, why? Check `?rpois` and `?rnorm`: `rpois()` requires lambda in addition to n.
+
+## 5. Could we simply add lambda?
+
+We could write:
+
+```{r}
+est_stat2 <- function(n, 
+                      distFn = rpois, 
+                      statFn = mean,
+                      lambda = 3) {
+  x <- distFn(n, lambda)
+  return(statFn(x))
+}
+
+est_stat2(1000)
+
+```
+
+We could do this, but it breaks the generalization of function, its not gonna work for `rnorm()`, or any other distributions anymore.
+
+How to avoid this? - we will pass the additional arguments that we don't know yet, or we don't have the control over them yet, into the `...`. Here `...` is gonna keep any parameters of any specific distribution we choose later.
+
+## 6. Using ... to pass additional arguments
+
+```{r}
+est_stat3 <- function(n,
+                      distFn = rnorm,
+                      statFn = mean,
+                      ...) {
+  x <- distFn(n, ...)
+  return(statFn(x))
+}
+
+est_stat3(1000, rpois, mean, lambda = 3) # Now `...` contains `lambda`.
+est_stat3(1000, runif, mean, min = 4, max = 12) # Now `...` contains `min`, `max`.
+```
+
+Now `...` can contain whatever parameters the chosen distribution needs.
+
+## 7. Creating our own distribution: a mixture distribution
+
+We're not limited to R's built-in distributions. We can create our own random-generating function.
+
+Suppose we want a mixture of:
+
+- a Normal distribution,
+
+- and an Exponential distribution.
+
+For each observation, we first randomly decide which distribution it comes from.
+
+```{r}
+rmixture <- function(n, prop = 0.5) {
+
+  # Decide which observations come from the Normal distribution
+  mixchoice <- rbinom(n, size = 1, prob = prop)
+
+  normalchoice <- mixchoice == 1
+
+  # Generate Normal observations
+  mixchoice[normalchoice] <-
+    rnorm(sum(normalchoice), mean = 100)
+
+  # Generate Exponential observations
+  mixchoice[!normalchoice] <-
+    rexp(sum(!normalchoice), rate = 1)
+
+  return(mixchoice)
+}
+rmixture(10)
+```
+
+## 8. Now the payoff: use our custom distribution in the general function
+
+Because rmixture() has the same basic pattern as other random-generation functions, we can plug it directly into est_stat3():
+
+```{r}
+est_stat3(1000, rmixture, mean, prop = 0.5)
+est_stat3(1000, rmixture, median, prop = 0.5)
+```
+
+## 9. Back to MC studies
+
+In a Monte Carlo study, we don't usually simulate just one data set. We instead repeat the entire process many times. For example, generate a sample of size 100 from a Poisson distribution with `\lambda=3`, calculate its sample mean, and repeat this experiment 1,000 times.
+
+```{r}
+sim_means <- replicate(
+  1000,
+  est_stat3(100, rpois, mean, lambda = 3)
+)
+
+mean(sim_means)
+sd(sim_means)
+hist(sim_means)
+```
+
+# Exercise 4: Debugging
+
+As our functions become more complicated, they may not always behave the way we expect.
+
+For very simple functions, one strategy is:
+
+- Write the code outside the function.
+
+- Make sure it works.
+
+- Wrap the working code inside function().
+
+But as functions get longer and more complicated, repeatedly pulling code out of the function becomes inefficient.
+
+Instead, we need ways to look inside a function while it is running. This process is called debugging.
+
+We'll start with the simplest debugging technique: print().
+
+## 1. `print()` statements
+
+Suppose we have the following function:
+
+```{r}
+foo <- function(n, i) {
+  z <- 0
+  for (k in 1:i) {
+    z <- k + 1
+  }
+  return(z + n)
+}
+foo(3, 5)
+# expect: 9
+```
+
+What if our function gives the wrong answer? Now suppose we accidentally write:
+
+```{r}
+foo2 <- function(n, i) {
+  z <- 0
+  for (k in 1:i) {
+    z <- k + 1*k
+  }
+  return(z + n)
+}
+
+foo2(3, 5)
+# expect: 9
+```
+
+Where is the bug? Right now, we could manage 6 lines of code and try to find it, but what if our function contains 100 lines. That's where `print()` becomes useful! Let's add several print() statements to see what is happening inside the function.
+
+```{r}
+foo3 <- function(n, i) {
+
+  z <- 0
+  print(paste("Starting value: z =", z))
+
+  for (k in 1:i) {
+
+    print(paste("1. In loop, k =", k))
+    print(paste("2. Before calculation, z =", z))
+
+    z <- k + 1*k
+
+    print(paste("3. After calculation, z =", z))
+  }
+
+  print(paste("4. Final value of z =", z))
+
+  return(z + n)
+}
+foo3(3, 5)
+```
+Now we can see exactly where things went wrong. Look at this line: "1. In loop, k = 5" ... R calculates "z = 10" which we actually intended was "z = 6".
+
+## 2. Saving objects into global environment:
+
+Another approach is to save an intermediate value so that we can examine it after the function finishes.
+
+```{r}
+foo4 <- function(n, i) {
+  z <- 0
+  for (k in 1:i) {
+    z <- k + 1*k
+  }
+  zsave <<- z # assigns z value into zsave so we can still access it in the global env 
+  return(z + n)
+}
+
+foo4(3, 5)
+zsave
+```
+
+
+Think of zsave as a checkpoint in our function. If we have a long function with several steps, we can place this checkpoint at different stages and check what the value looks like. If the value is correct here, the bug probably happens later. If the value is already wrong here, the bug must have happened at or before this point.
+
+## 3. `traceback()` tell us where it went wrong in a chain of function calls
+
+1. Start with a simple error
+
+First show a working function:
+
+```{r}
+bar <- function(i, j) {
+  return(i * 3 + 2 * j)
+}
+
+bar(3, 4)
+```
+
+Supposed I had a bug there:
+
+```{r}
+bar <- function(i, j) {
+  q <- 4
+  z <- i * 3 + 2 * a
+  w <- 2
+  return(z)
+}
+
+bar(3, 4)
+```
+
+This error is pretty easy to debug because everything happens inside one function. We can look at `bar()` and notice that `a` was never defined.
+
+2. Now make the problem harder, what if I have third function:
+
+```{r}
+bar <- function(i, j) {
+  q <- 4
+  z <- i * 3 + 2 * baz(j)
+  w <- 2
+  return(z)
+}
+
+baz <- function(t) {
+  return(2*t + a)
+}
+
+bar(3, 4)
+```
+
+Here it is easy to go back and check individual function and find that `baz(j)` is having issue with `a`. While running baz(), R encountered the error.
+
+3. Now introduce `traceback()`, shows the sequence of function calls that led to the most recent error. This helps us identify which function failed and which functions called it. 
+
+Immediately after the error, run:
+
+```{r}
+traceback()
+```
+
+The numbers tell you which line of the calling function each sub-function is referenced at: the “#3” means the call to bar occurs on the 3rd line of foo (including the definition line).
+
+This can help you to identify what specific function is erroring (this is especially useful during modeling steps as there can be a very large call stack), or what other functions in the callstack may be causing the issue.
+
+4. More example with `traceback()`
+
+```{r}
+lm(1 ~ wt, data = mtcars)
+traceback()
+```
+
+## 4. The “browser”
+
+Formal debugging, stepping through a function line-by-line as if it were purely interactive, can be performed by using the “browser”.
+
+Especially if you have a long function, you can choose to enter the browser at any line in the function by including a call to browser(). For example, suppose we want a function that calculates a student's average score:
+
+```{r}
+student_avg <- function(scores) {
+  
+  total_scores <- sum(scores)
+  total <- length(scores)
+  
+  avg <- total_scores / (total - 1)   # BUG: should divide by total
+  
+  browser()
+  
+  return(avg)
+}
+
+student_avg(c(80, 90, 100))
+```
+
+
+When R reaches browser(), execution pauses, we can inspect the objects that exist inside the function. 
+
+Another example. We can also use browser() to examine how objects change at different stages of a function.
+
+```{r}
+adjust_scores <- function(scores) {
+  
+  scores <- scores + 10
+  
+  browser()
+  
+  scores[scores > 100] <- 100
+  
+  return(scores)
+}
+
+adjust_scores(c(80, 90, 95))
+```
+
+## 5. Profiling
+
+Debugging helps us find why our code is not working correctly. Sometimes, however, our code works correctly but is too slow.
+
+Profiling measures where R spends its time while executing our code. This can help us identify which parts of our code are responsible for most of the running time.
+
+R has the built-in functions `Rprof()` and `summaryRprof()`. The `profvis` package provides an interactive visualization of profiling information collected using `Rprof()`.
+
+```{r}
+# install.packages("profvis")
+library(profvis)
+```
+
+A simple example, suppose we calculate the column means of a relatively large matrix, we could calculate the means using a loop:
+
+```{r}
+set.seed(123)
+
+x <- matrix(rnorm(500000000), 
+            nrow = 1000000, 
+            ncol = 500)
+
+means <- numeric(ncol(x))
+
+for (j in 1:ncol(x)) {
+  means[j] <- mean(x[, j])
+}
+```
+
+The code works fine, but it is very slow, we know because of the loop we used. 
+
+We can wrap the code in profvis():
+
+```{r}
+profvis({
+  
+  means <- numeric(ncol(x))
+  
+  for (j in 1:ncol(x)) {
+    means[j] <- mean(x[, j])
+  }
+  
+})
+```
+
+profvis() runs the expression while collecting profiling information and displays the results using an interactive visualization.
+
+After identifying the slow part, we can ask whether there is a more efficient way to perform the same calculation.
+
+For a matrix, we already have `colMeans()`.
+
+```{r}
+profvis({
+  means <- colMeans(x)
+})
+```
+
+Another example:
+
+```{r}
+# install.packages("ggplot2")
+library(lme4)
+library(ggplot2)
+data("diamonds")
+dim(diamonds)
+head(diamonds)
+
+mod <- glmer(depth ~ table + price + (1 | color), data = diamonds)
+
+profvis(lmer(depth ~ table + price + (1 + price | color), data = diamonds))
+
+
+profvis({
+  for (i in 1:100) {
+  lm(depth ~ table + price, data = diamonds)
+  }
+})
+```
+
+
+
