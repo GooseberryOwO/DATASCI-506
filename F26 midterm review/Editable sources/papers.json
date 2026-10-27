@@ -1,0 +1,2832 @@
+{
+  "2023": {
+    "source": "https://dept.stat.lsa.umich.edu/~jerrick/courses/stat506_f23/midterm-solns.html",
+    "questions": [],
+    "answers": [
+      [
+        {
+          "type": "h",
+          "text": "Problem 1"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 25. The selected odd values are 1, 3, 5, 7, 9.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 42. The recycled multipliers are 2, 1, 2, 1, 2; the first and fifth products are 2 and 40. A recycling warning does not prevent the calculation.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "c(-3, 0, -3)",
+          "blank": 0,
+          "qline": false,
+          "text": "Row sums are 3, 5, 3; column sums are 6, 5. Recycle the column-sum vector as 6, 5, 6 before subtraction.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 1.25. Trace 10 -> 5 -> 2.5 -> 1.25, then return the value at or below 2.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 3. The variable d equals a. Its means are 2 in group b=1 and 3 in group b=2; descending order selects 3.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 35. Add successive triangular totals 1 + 3 + 6 + 10 + 15. The next while condition then fails.",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 2 - SAS"
+        },
+        {
+          "type": "p",
+          "text": "These questions belong to the F23 scope. SAS is outside the published F26 Lecture 1-9 scope.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "proc sort data=work.housing;\n    by age;\nrun;",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "sas"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "data work.housing;\n    set work.housing;\n    birthyear = year - age;\nrun;",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "sas"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "proc sort data=work.housing;\n    by owns_home;\nrun;\nproc means data=work.housing;\n    var birthyear;\n    by owns_home;\nrun;",
+          "blank": 0,
+          "qline": false,
+          "text": "Alternatively, use CLASS owns_home with PROC MEANS if no BY processing is required.",
+          "lang": "sas"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 3 - Model translation and Stata"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "lm(y ~ x1 + factor(x2) + x3*x4, data = dat)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "lm(y ~ factor(x1)*factor(x2)*factor(x3) - 1, data = dat)",
+          "blank": 0,
+          "qline": false,
+          "text": "In the Stata interaction specification, the unprefixed x3 is treated as categorical. Remove the intercept.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "lm(y ~ x1 + x1:x2, data = dat)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "lm(y ~ I(x1^2) + x2 + log(x3), data = dat)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "foreach var of varlist bin1-bin20 {\n    replace `var' = `var' - 1\n}",
+          "blank": 0,
+          "qline": false,
+          "text": "Subtract one from each 1/2-coded variable.",
+          "lang": "stata"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "margins race, at(age = (20(10)80))\nmarginsplot",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "stata"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "",
+          "code": "generate sd = (x1 - x2)^2\ncollapse (mean) sd, by(group)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "stata"
+        },
+        {
+          "type": "item",
+          "label": "h",
+          "prompt": "",
+          "code": "Q = max(diagonal(X))",
+          "blank": 0,
+          "qline": false,
+          "text": "Insert this line inside the provided Mata block before st_matrix(\"q\", Q).",
+          "lang": "mata"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 4 - Regex matching"
+        },
+        {
+          "type": "p",
+          "text": "Patterns are shown as R string contents. X means a match; a blank means no match.",
+          "style": "body"
+        },
+        {
+          "type": "regex",
+          "strings": [
+            "Adedayo",
+            "Dinah",
+            "Frida",
+            "Liam",
+            "Marlyn",
+            "Milko",
+            "Mirka",
+            "Rupert",
+            "Rustik",
+            "Sebastian"
+          ],
+          "patterns": [
+            "[Aa]*[a-zA-Z]+.{2}o$",
+            "^..?...$",
+            "^[^AS]..?[aeiou]",
+            "(.).\\\\1"
+          ],
+          "answer": [
+            [
+              true,
+              false,
+              false,
+              true
+            ],
+            [
+              false,
+              true,
+              true,
+              false
+            ],
+            [
+              false,
+              true,
+              true,
+              false
+            ],
+            [
+              false,
+              true,
+              true,
+              false
+            ],
+            [
+              false,
+              false,
+              false,
+              false
+            ],
+            [
+              true,
+              true,
+              false,
+              false
+            ],
+            [
+              false,
+              true,
+              false,
+              false
+            ],
+            [
+              false,
+              false,
+              true,
+              false
+            ],
+            [
+              false,
+              false,
+              false,
+              false
+            ],
+            [
+              false,
+              false,
+              false,
+              false
+            ]
+          ]
+        },
+        {
+          "type": "space",
+          "height": 14
+        },
+        {
+          "type": "p",
+          "text": "a: A suffix ending in o with enough preceding characters. The optional [Aa]* can match zero characters; it does not forbid an initial A or a.",
+          "style": "body"
+        },
+        {
+          "type": "p",
+          "text": "b: Exactly four or five characters. c: The first character is neither A nor S, and a vowel occurs in position 3 or 4. d: The same character occurs with exactly one intervening character, as in ded.",
+          "style": "body"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 5 - SQL output"
+        },
+        {
+          "type": "sub",
+          "text": "a"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "x",
+              "y",
+              "q",
+              "z"
+            ],
+            [
+              "9",
+              "8",
+              "1",
+              "2"
+            ],
+            [
+              "1",
+              "8",
+              "2",
+              "5"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "b"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "x",
+              "x1"
+            ],
+            [
+              "2",
+              "1"
+            ],
+            [
+              "9",
+              "8"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "c"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "q",
+              "xx"
+            ],
+            [
+              "2",
+              "11"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "d"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "x",
+              "p"
+            ],
+            [
+              "2",
+              "4"
+            ],
+            [
+              "9",
+              "NA"
+            ],
+            [
+              "7",
+              "NA"
+            ],
+            [
+              "3",
+              "NA"
+            ],
+            [
+              "1",
+              "NA"
+            ],
+            [
+              "6",
+              "NA"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "e"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "x",
+              "p"
+            ],
+            [
+              "2",
+              "4"
+            ],
+            [
+              "NA",
+              "8"
+            ]
+          ],
+          "small": false
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 6 - Von Neumann extractor"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "vonneumann <- function(p) {\n  repeat {\n    flips <- rbinom(2, size = 1, prob = p)\n    if (flips[1] != flips[2]) return(flips[1])\n  }\n}",
+          "blank": 0,
+          "qline": false,
+          "text": "The actual R function requires size=1 for a Bernoulli flip. Ignore identical pairs and return the first result from a differing pair.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "set.seed(506)\np <- 0.7\nreps <- 10000\nout <- sapply(seq_len(reps), function(i) vonneumann(p))\nmean(out)",
+          "blank": 0,
+          "qline": false,
+          "text": "The estimate should be near 0.5 and will vary with the random stream. Both HT and TH have probability p(1-p), so conditional on a differing pair the first result is fair.",
+          "lang": "r"
+        }
+      ]
+    ]
+  },
+  "2024": {
+    "source": "https://dept.stat.lsa.umich.edu/~jerrick/courses/stat506_f24/midtermsolns.html",
+    "questions": [
+      [
+        {
+          "type": "h",
+          "text": "Problem 1"
+        },
+        {
+          "type": "p",
+          "text": "Determine q after each independent code fragment runs. Show intermediate work when useful. Assume required packages are loaded.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "x <- seq(2, 20, by = 2)\ny <- x[x > 10]\nq <- sum(y[y %% 4 == 0])",
+          "blank": 24,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "x <- list(a = 1:5, b = 6:10, c = 11:15)\ny <- sapply(x, function(z) z[1] + z[length(z)])\nq <- y * c(1, 10)",
+          "blank": 24,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "x <- matrix(c(2, 4, 6, 2, 4, 6), nrow = 2, byrow = FALSE)\nq <- apply(x, 1, sum) - apply(x, 2, sum)",
+          "blank": 24,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 1 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "q <- 0\nx <- 4\nwhile (x > 0) {\n  for (y in 1:x) {\n    q <- q + y\n  }\n  x <- x - 1\n}",
+          "blank": 14,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "tibble(x = c(2, 4, 6, 8, 10),\n       y = c(1, 2, 3, 2, 1)) %>%\n  mutate(z = x * y, w = z - x) %>%\n  group_by(y) %>%\n  summarize(v = sum(w)) %>%\n  ungroup() %>%\n  arrange(desc(v)) %>%\n  filter(v == 0) %>%\n  select(y) %>%\n  as.numeric -> q",
+          "blank": 14,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "f <- function(x, z = 0) {\n  if (x <= 1) {\n    return(z + x)\n  } else {\n    return(f(x - 1, z + x))\n  }\n}\nq <- f(5)",
+          "blank": 14,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 2"
+        },
+        {
+          "type": "p",
+          "text": "mydata is a data.frame with 5,732 rows and the following nine columns. Write R code for each cleaning operation, creating variables inside mydata and accounting for missing values.",
+          "style": "body"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "Variable",
+              "Type",
+              "Example values"
+            ],
+            [
+              "employeeid",
+              "int",
+              "1 2 3 4 5 6 7 8 9 10 ..."
+            ],
+            [
+              "age",
+              "int",
+              "34 28 45 NA 38 30 31 27 42 36 ..."
+            ],
+            [
+              "gender",
+              "chr",
+              "\"Male\" \"Female\" \"Male\" \"\" \"Male\" \"Male\" ..."
+            ],
+            [
+              "educationlevel",
+              "chr",
+              "\"Bachelor\" \"Master\" \"High School\" \"\" \"Bachelor\" \"PhD\" ..."
+            ],
+            [
+              "yearsatcompany",
+              "int",
+              "5 2 10 3 7 15 4 1 8 12 ..."
+            ],
+            [
+              "department",
+              "chr",
+              "\"Engineering\" \"HR\" \"Sales\" \"Marketing\" \"Engineering\" ..."
+            ],
+            [
+              "monthlyhours",
+              "int",
+              "160 150 170 155 165 175 160 145 168 172 ..."
+            ],
+            [
+              "annualsalary",
+              "num",
+              "55000 48000 62000 50000 58000 67000 54000 ..."
+            ],
+            [
+              "productivityscore",
+              "num",
+              "85 90 NA 88 80 -5 92 87 75 89 ..."
+            ]
+          ],
+          "small": true,
+          "widths": [
+            100,
+            38,
+            330
+          ]
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "Create a variable containing the log of annual salary.",
+          "code": "",
+          "blank": 30,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "Create a binary variable female. Gender is Male, Female, or unanswered; handle unanswered values appropriately.",
+          "code": "",
+          "blank": 30,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "Convert department to a factor.",
+          "code": "",
+          "blank": 30,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 2 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "Calculate hourly wage from annual salary and monthly working hours.",
+          "code": "",
+          "blank": 56,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "Remove employees earning more than $50 per hour, using the variable from part d.",
+          "code": "",
+          "blank": 56,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "Standardize annual salary to mean 0 and variance 1.",
+          "code": "",
+          "blank": 56,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "Negative productivity scores identify exemptions. Recode those values as missing.",
+          "code": "",
+          "blank": 56,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "h",
+          "prompt": "The minimum hiring age is 18. When the recorded age and years at the company imply an impossible hiring age, set both recorded variables to NA.",
+          "code": "",
+          "blank": 56,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 3"
+        },
+        {
+          "type": "p",
+          "text": "For a-d, write one R line fitting the indicated model. The data.frame is dat; all named columns are numeric.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "y = β₀ + β₁x + ε",
+          "code": "",
+          "blank": 80,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "y = β₀ + β₁q + β₂z + β₃(q × z) + ε",
+          "code": "",
+          "blank": 80,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "y = β₁q + β₂(q × z) + ε",
+          "code": "",
+          "blank": 80,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "y = β₀ + β₁q + β₂q² + ε",
+          "code": "",
+          "blank": 80,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 3 (continued)"
+        },
+        {
+          "type": "p",
+          "text": "For e-g, write the mathematical regression equation represented by each call. Include an intercept when appropriate. z has numeric values 1, 2, and 3.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "lm(y ~ x + as.factor(z), data = dat)",
+          "blank": 100,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "lm(y ~ I(x + 2) + I(z^2), data = dat)",
+          "blank": 100,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "",
+          "code": "lm(y ~ x:z - x, data = dat)",
+          "blank": 100,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 4"
+        },
+        {
+          "type": "p",
+          "text": "Mark X when the pattern matches a date string; otherwise leave the cell empty. No string has leading or trailing whitespace. Patterns below are R string contents.",
+          "style": "body"
+        },
+        {
+          "type": "regex",
+          "strings": [
+            "2023-10-14",
+            "14/10/2023",
+            "Oct 14, 2023",
+            "10-14-2023",
+            "2023/10/14",
+            "14-Oct-23",
+            "20231014",
+            "2023.10.14",
+            "14 October 2023",
+            "14-10-2023"
+          ],
+          "patterns": [
+            "^[^0-9]",
+            "(.)0.*\\\\1",
+            "^[0-9]{4}.?[0-9]{2}.?[0-9]{2}$",
+            "^[0-9]+.?[0-9]+.?[0-9]+$"
+          ],
+          "answer": null
+        },
+        {
+          "type": "space",
+          "height": 16
+        },
+        {
+          "type": "p",
+          "text": "Scratch work:",
+          "style": "body"
+        },
+        {
+          "type": "blank",
+          "height": 100
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 5"
+        },
+        {
+          "type": "p",
+          "text": "The tables data and data2 are shown below. For a-e, give each query output, including its column names.",
+          "style": "body"
+        },
+        {
+          "type": "p",
+          "text": "data",
+          "style": "body"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "a",
+              "b",
+              "c",
+              "i"
+            ],
+            [
+              "5",
+              "4",
+              "1",
+              "1"
+            ],
+            [
+              "8",
+              "4",
+              "1",
+              "2"
+            ],
+            [
+              "4",
+              "4",
+              "2",
+              "3"
+            ],
+            [
+              "9",
+              "4",
+              "1",
+              "4"
+            ],
+            [
+              "3",
+              "8",
+              "2",
+              "5"
+            ],
+            [
+              "1",
+              "5",
+              "1",
+              "6"
+            ]
+          ],
+          "small": false,
+          "widths": [
+            80,
+            80,
+            80,
+            80
+          ]
+        },
+        {
+          "type": "p",
+          "text": "data2",
+          "style": "body"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "i",
+              "n"
+            ],
+            [
+              "5",
+              "1"
+            ],
+            [
+              "2",
+              "8"
+            ],
+            [
+              "7",
+              "7"
+            ]
+          ],
+          "small": false,
+          "widths": [
+            80,
+            80
+          ]
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "SELECT *\nFROM data\nWHERE b == 8",
+          "blank": 45,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "SELECT a, b - 1 AS b1\nFROM data\nORDER BY -b1\nLIMIT 2",
+          "blank": 45,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 5 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "SELECT c, SUM(a) AS aa\nFROM data\nGROUP BY c\nHAVING aa < 15",
+          "blank": 85,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "SELECT d1.a, d2.n\nFROM data AS d1\nINNER JOIN data2 AS d2 ON d1.i = d2.i",
+          "blank": 85,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "SELECT d1.a, d2.n\nFROM data AS d1\nRIGHT JOIN data2 AS d2 ON d1.i = d2.i",
+          "blank": 85,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 5 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "Write one SQL query producing the following result. Pay attention to which table supplies i.",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "a",
+              "i",
+              "n"
+            ],
+            [
+              "9",
+              "4",
+              "NA"
+            ],
+            [
+              "8",
+              "2",
+              "8"
+            ],
+            [
+              "5",
+              "1",
+              "NA"
+            ]
+          ],
+          "small": false,
+          "widths": [
+            80,
+            80,
+            80
+          ]
+        },
+        {
+          "type": "blank",
+          "height": 340
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 6"
+        },
+        {
+          "type": "p",
+          "text": "A roulette wheel has 38 equally likely slots: numbers 1-36, 0, and 00. There are 18 red, 18 black, and 2 green slots. Represent 00 numerically as -1. In 1-10 and 19-28, odd numbers are red and even numbers are black; in 11-18 and 29-36 the parity colors are reversed. Both 0 and 00 are green.",
+          "style": "body"
+        },
+        {
+          "type": "p",
+          "text": "You may use sample(x, size, replace, prob). It returns size draws from x; replace controls replacement and prob supplies optional relative weights. Input checks and function documentation are not required.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "Write spin(n, color = FALSE). Return a vector of n spins: numeric slot values when color is FALSE, or character colors when TRUE. Assume n is a positive integer and color is logical.",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "blank",
+          "height": 320
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 6 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "Use spin to simulate a fixed number of spins and count all length-three consecutive windows with the same color. Overlaps count: four consecutive reds contain two qualifying windows. Return the count, not a proportion. Your code need not be efficient; use of an efficient method can receive minor extra credit.",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "blank",
+          "height": 420
+        }
+      ]
+    ],
+    "answers": [
+      [
+        {
+          "type": "h",
+          "text": "Problem 1"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 48: selected values are 12, 16, and 20.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "c(a = 6, b = 160, c = 26)",
+          "blank": 0,
+          "qline": false,
+          "text": "Endpoint sums are 6, 16, 26, multiplied by recycled 1, 10, 1. A recycling warning is expected.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "c(6, 4, 2)",
+          "blank": 0,
+          "qline": false,
+          "text": "Both row sums are 12; column sums are 6, 8, 10. Recycle 12,12 as 12,12,12 and subtract.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 20: add 10 + 6 + 3 + 1.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 1: after aggregation, the y=1 group has v=0; the other groups do not.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 15: accumulate 5+4+3+2+1 in the recursive state z.",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 2"
+        },
+        {
+          "type": "p",
+          "text": "One valid base-R approach is below. Other equivalent solutions are possible. Retain unknown hourly wages in e because the request only removes known wages above $50.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "mydata$logsal <- log(mydata$annualsalary)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "mydata$female <- mydata$gender == \"Female\"\nmydata$female[mydata$gender == \"\"] <- NA",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "mydata$department <- as.factor(mydata$department)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "mydata$hourlywage <- mydata$annualsalary / 12 / mydata$monthlyhours",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "keep <- is.na(mydata$hourlywage) | mydata$hourlywage <= 50\nmydata <- mydata[keep, , drop = FALSE]",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "mydata$annualsalary <-\n  (mydata$annualsalary - mean(mydata$annualsalary, na.rm = TRUE)) /\n  sd(mydata$annualsalary, na.rm = TRUE)",
+          "blank": 0,
+          "qline": false,
+          "text": "Assume the nonmissing salary values have nonzero standard deviation.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "",
+          "code": "mydata$productivityscore[mydata$productivityscore < 0] <- NA",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "h",
+          "prompt": "",
+          "code": "bad <- which(mydata$age - mydata$yearsatcompany < 18)\nmydata$age[bad] <- NA\nmydata$yearsatcompany[bad] <- NA",
+          "blank": 0,
+          "qline": false,
+          "text": "Compute the bad-row indicator once, before changing either variable.",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 3"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "lm(y ~ x, data = dat)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "lm(y ~ q*z, data = dat)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "lm(y ~ q + q:z - 1, data = dat)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "lm(y ~ q + I(q^2), data = dat)",
+          "blank": 0,
+          "qline": false,
+          "text": "An equivalent call uses poly(q, 2, raw = TRUE). The default orthogonal basis does not give the displayed raw coefficients.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "y = β₀ + β₁x + β₂I(z=2) + β₃I(z=3) + ε, with z=1 as the reference category.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "y = β₀ + β₁(x+2) + β₂z² + ε.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "y = β₀ + β₁(x × z) + ε. x:z does not automatically include x, so subtracting x removes no existing main effect.",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 4"
+        },
+        {
+          "type": "p",
+          "text": "Table below follows the ordinary capture-group interpretation, using perl=TRUE for pattern b. See the engine note below.",
+          "style": "body"
+        },
+        {
+          "type": "regex",
+          "strings": [
+            "2023-10-14",
+            "14/10/2023",
+            "Oct 14, 2023",
+            "10-14-2023",
+            "2023/10/14",
+            "14-Oct-23",
+            "20231014",
+            "2023.10.14",
+            "14 October 2023",
+            "14-10-2023"
+          ],
+          "patterns": [
+            "^[^0-9]",
+            "(.)0.*\\\\1",
+            "^[0-9]{4}.?[0-9]{2}.?[0-9]{2}$",
+            "^[0-9]+.?[0-9]+.?[0-9]+$"
+          ],
+          "answer": [
+            [
+              false,
+              true,
+              true,
+              true
+            ],
+            [
+              false,
+              true,
+              false,
+              true
+            ],
+            [
+              true,
+              true,
+              false,
+              false
+            ],
+            [
+              false,
+              true,
+              false,
+              true
+            ],
+            [
+              false,
+              true,
+              true,
+              true
+            ],
+            [
+              false,
+              false,
+              false,
+              false
+            ],
+            [
+              false,
+              true,
+              true,
+              true
+            ],
+            [
+              false,
+              true,
+              true,
+              true
+            ],
+            [
+              false,
+              true,
+              false,
+              false
+            ],
+            [
+              false,
+              true,
+              false,
+              true
+            ]
+          ]
+        },
+        {
+          "type": "space",
+          "height": 12
+        },
+        {
+          "type": "p",
+          "text": "Engine note: for b, the official F24 solution reports FALSE under default R and TRUE under perl=TRUE for 14/10/2023 and 14-10-2023. Both answers were accepted for those two entries in that exam. The remaining entries agree.",
+          "style": "body"
+        },
+        {
+          "type": "p",
+          "text": "c permits an optional arbitrary character between numeric blocks, including no separator. d also accepts compact numeric dates because the digit runs can split one long run. Neither pattern validates calendar dates.",
+          "style": "body"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 5"
+        },
+        {
+          "type": "sub",
+          "text": "a"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "a",
+              "b",
+              "c",
+              "i"
+            ],
+            [
+              "3",
+              "8",
+              "2",
+              "5"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "b"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "a",
+              "b1"
+            ],
+            [
+              "3",
+              "7"
+            ],
+            [
+              "1",
+              "4"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "c"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "c",
+              "aa"
+            ],
+            [
+              "2",
+              "7"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "d"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "a",
+              "n"
+            ],
+            [
+              "8",
+              "8"
+            ],
+            [
+              "3",
+              "1"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "e"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "a",
+              "n"
+            ],
+            [
+              "8",
+              "8"
+            ],
+            [
+              "3",
+              "1"
+            ],
+            [
+              "NA",
+              "7"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "SELECT d1.a, d1.i, d2.n\nFROM data AS d1\nLEFT JOIN data2 AS d2 ON d1.i = d2.i\nORDER BY d1.a DESC\nLIMIT 3",
+          "blank": 0,
+          "qline": false,
+          "text": "Use d1.i. For unmatched left rows d2.i would be NULL, while d1.i remains available.",
+          "lang": "sql"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 6"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "spin <- function(n, color = FALSE) {\n  if (color) {\n    sample(c(\"red\", \"black\", \"green\"), n, replace = TRUE,\n           prob = c(18, 18, 2))\n  } else {\n    sample(-1:36, n, replace = TRUE)\n  }\n}",
+          "blank": 0,
+          "qline": false,
+          "text": "Sampling colors directly is sufficient when only the marginal color results are requested.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "set.seed(506)\nreps <- 1000\nresults <- spin(reps, color = TRUE)\ncount <- 0\nfor (i in 3:reps) {\n  if (results[i-2] == results[i-1] &&\n      results[i-1] == results[i]) count <- count + 1\n}\ncount",
+          "blank": 0,
+          "qline": false,
+          "text": "Every ending position from 3 through reps defines a window. Do not skip ahead after a successful window; overlaps must be counted.",
+          "lang": "r"
+        }
+      ]
+    ]
+  },
+  "2025": {
+    "source": "https://dept.stat.lsa.umich.edu/~jerrick/courses/stat506_f25/midtermsolns.html",
+    "questions": [
+      [
+        {
+          "type": "h",
+          "text": "Problem 1"
+        },
+        {
+          "type": "p",
+          "text": "Determine q after each independent code fragment runs. Show intermediate work when useful. Assume required packages are loaded.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "a <- rep(-9, times = 10)\nfor (i in 1:10) {\n  if (i %% 2 == 1) {\n    a[i] <- i\n  }\n}\nq <- sum(a[a > 0])",
+          "blank": 25,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "x <- 1:4\ny <- matrix(1:12, nrow = 3)\nq <- sum(y[, x %% 3 == 0])",
+          "blank": 25,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "x <- c(2, 4, 6, 8)\ny <- matrix(c(1, 3, 5, 7, 1, 3, 5, 7), ncol = 2, byrow = FALSE)\nq <- x * y",
+          "blank": 25,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 1 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "q <- sapply(1:10, function(x) {\n  ifelse(x < 5, x, x - 5)\n})",
+          "blank": 18,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "tibble(x = c(3, 5, 7, 9, 11),\n       y = c(2, 2, 3, 3, 3)) %>%\n  mutate(z = x + y, w = z %% y, u = z - w) %>%\n  group_by(y) %>%\n  summarize(v = mean(u) - min(u)) %>%\n  arrange(v) %>%\n  head(1) %>%\n  select(y) %>%\n  as.numeric() -> q",
+          "blank": 18,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "foo <- function(x) {\n  bar(x + 2)\n}\nbar <- function(z) {\n  baz(z + z^2)\n}\nbaz <- function(t) {\n  return(t / 2)\n}\nq <- bar(5)",
+          "blank": 18,
+          "qline": true,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 2"
+        },
+        {
+          "type": "p",
+          "text": "mydata is a data.frame of 4,820 patients with the ten columns below. Write R code for the requested cleaning and analysis steps; create new columns inside mydata and account for missing values.",
+          "style": "body"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "Variable",
+              "Type",
+              "Example values"
+            ],
+            [
+              "patient_id",
+              "int",
+              "1 2 3 4 5 6 7 8 9 10 ..."
+            ],
+            [
+              "age",
+              "int",
+              "55 47 61 33 29 74 38 42 68 51 ..."
+            ],
+            [
+              "sex",
+              "chr",
+              "\"Male\" \"Female\" \"\" \"Female\" \"Male\" \"Male\" ..."
+            ],
+            [
+              "bmi_category",
+              "chr",
+              "\"Overweight\" \"Normal\" \"Obese\" \"\" \"Normal\" \"Obese\" ..."
+            ],
+            [
+              "years_smoking",
+              "int",
+              "10 0 25 4 0 40 6 12 30 -2 ..."
+            ],
+            [
+              "treatment",
+              "chr",
+              "\"Placebo\" \"DrugA\" \"DrugB\" \"Placebo\" \"DrugA\" ..."
+            ],
+            [
+              "systolic_bp",
+              "int",
+              "132 120 148 115 118 160 128 124 154 139 ..."
+            ],
+            [
+              "diastolic_bp",
+              "int",
+              "85 78 92 70 72 95 80 76 88 82 ..."
+            ],
+            [
+              "cholesterol",
+              "num",
+              "210 180 265 175 190 300 195 205 290 250 ..."
+            ],
+            [
+              "outcome_score",
+              "num",
+              "78 85 NA 90 14 88 82 95 80 91 ..."
+            ]
+          ],
+          "small": true,
+          "widths": [
+            100,
+            38,
+            330
+          ]
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "None of the numeric entries should be negative. Recode negative numeric values to NA.",
+          "code": "",
+          "blank": 26,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "Create mean_arterial_pressure, defined as (2 × diastolic_bp + systolic_bp) / 3.",
+          "code": "",
+          "blank": 26,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "Create smoking, indicating nonzero years_smoking.",
+          "code": "",
+          "blank": 26,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 2 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "Convert sex into a binary variable named female, handling unanswered responses.",
+          "code": "",
+          "blank": 38,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "Restrict the data to patients identified as female.",
+          "code": "",
+          "blank": 38,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "Remove patients outside the inclusive age range 18-65.",
+          "code": "",
+          "blank": 38,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "Rescale outcome_score to the interval from 0 to 1.",
+          "code": "",
+          "blank": 38,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "h",
+          "prompt": "Fit a linear model of outcome_score using categorical treatment; age and mean_arterial_pressure with their interaction and both main effects; and a cubic relationship in cholesterol.",
+          "code": "",
+          "blank": 70,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "i",
+          "prompt": "Calculate the average predicted outcome from the model in h.",
+          "code": "",
+          "blank": 38,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 3"
+        },
+        {
+          "type": "p",
+          "text": "For a-d, the code is syntactically valid but does not achieve its stated goal. Identify the logical error and fix it with minimal changes.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "Add a separate random-noise value to every element of x, which may have any length.",
+          "code": "noisyx <- x + rnorm(1)",
+          "blank": 45,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "Create yearsempl from yearsfull for full-time workers and yearspart for part-time workers.",
+          "code": "data$yearsempl <- data$yearsfull\ndata$yearsempl[data$isparttime] <- data$yearspart",
+          "blank": 45,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "Add every element of the numeric vector data.",
+          "code": "for (i in 1:length(data)) {\n  sum <- 0\n  sum <- sum + data[i]\n}",
+          "blank": 45,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "Estimate average mileage separately for each manufacturer.",
+          "code": "cars %>%\n  select(manufacturer, mpg) %>%\n  summarize(meanmpg = mean(mpg))",
+          "blank": 45,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 3 (continued)"
+        },
+        {
+          "type": "p",
+          "text": "For e-g, classify z as always TRUE, always FALSE, or depends, and explain in one or two sentences. mydata is a data.frame and every referenced column exists. Ignore NA outcomes when making the classification.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "mylist <- as.list(mydata)\nz <- length(mylist[[1]]) == length(mylist[[2]])",
+          "blank": 85,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "mydata$agecapped <- mydata$age\nmydata$agecapped[mydata$age > 50] <- 50\nz <- mean(mydata$agecapped) > mean(mydata$age)",
+          "blank": 85,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "",
+          "code": "mydata2 <- mydata %>%\n  filter(urbanrural == \"rural\") %>%\n  group_by(state) %>%\n  summarize(meaninc = mean(income))\nz <- nrow(mydata) == nrow(mydata2)",
+          "blank": 85,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 4"
+        },
+        {
+          "type": "p",
+          "text": "orders and sku_map contain the rows below. For a-e, give the complete output table, including column names.",
+          "style": "body"
+        },
+        {
+          "type": "p",
+          "text": "orders",
+          "style": "body"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "p",
+              "q",
+              "r",
+              "k"
+            ],
+            [
+              "6",
+              "2",
+              "1",
+              "1"
+            ],
+            [
+              "3",
+              "5",
+              "1",
+              "2"
+            ],
+            [
+              "9",
+              "5",
+              "2",
+              "4"
+            ],
+            [
+              "2",
+              "2",
+              "3",
+              "6"
+            ]
+          ],
+          "small": false,
+          "widths": [
+            80,
+            80,
+            80,
+            80
+          ]
+        },
+        {
+          "type": "p",
+          "text": "sku_map",
+          "style": "body"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "k",
+              "m"
+            ],
+            [
+              "1",
+              "10"
+            ],
+            [
+              "2",
+              "20"
+            ],
+            [
+              "3",
+              "30"
+            ],
+            [
+              "4",
+              "40"
+            ],
+            [
+              "5",
+              "50"
+            ],
+            [
+              "6",
+              "60"
+            ]
+          ],
+          "small": false,
+          "widths": [
+            80,
+            80
+          ]
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "SELECT *\nFROM orders\nWHERE q >= 5",
+          "blank": 42,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "SELECT k, p + 2 AS p2\nFROM orders\nORDER BY -p2\nLIMIT 2",
+          "blank": 42,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 4 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "SELECT r, SUM(p) AS pp\nFROM orders\nGROUP BY r\nHAVING pp > 7",
+          "blank": 95,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "SELECT o.p, s.m\nFROM orders AS o\nINNER JOIN sku_map AS s ON o.k = s.k",
+          "blank": 95,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "SELECT o.p, s.m\nFROM orders AS o\nRIGHT JOIN sku_map AS s ON o.k = s.k",
+          "blank": 95,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 4 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "Write one SQL query producing this output:",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "r",
+              "k",
+              "sku_value"
+            ],
+            [
+              "3",
+              "6",
+              "60"
+            ],
+            [
+              "2",
+              "4",
+              "40"
+            ],
+            [
+              "1",
+              "2",
+              "20"
+            ],
+            [
+              "1",
+              "1",
+              "10"
+            ]
+          ],
+          "small": false,
+          "widths": [
+            90,
+            90,
+            150
+          ]
+        },
+        {
+          "type": "blank",
+          "height": 340
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 5"
+        },
+        {
+          "type": "p",
+          "text": "Mark X when each pattern matches the email string; otherwise leave the cell blank. Assume no leading or trailing whitespace. Patterns are displayed as R string contents.",
+          "style": "body"
+        },
+        {
+          "type": "regex",
+          "strings": [
+            "alice@gmail.com",
+            "bob.smith@umich.edu",
+            "test123@yahoo.com",
+            "jane-doe@company.org",
+            "contact@123web.net",
+            "admin@mailserver.local",
+            "user99@gmail.com",
+            "info@college.edu",
+            "myorg@domain.co.uk",
+            "support@website.io"
+          ],
+          "patterns": [
+            "^[^@]+@.+\\\\..+",
+            "(org|com)",
+            "[0-9]{3}",
+            "\\\\.[a-z]+\\\\.[a-z]+$"
+          ],
+          "answer": null
+        },
+        {
+          "type": "space",
+          "height": 14
+        },
+        {
+          "type": "p",
+          "text": "Scratch work:",
+          "style": "body"
+        },
+        {
+          "type": "blank",
+          "height": 100
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 6"
+        },
+        {
+          "type": "p",
+          "text": "Each mystery pack contains one sticker, labeled A-E. Pack 1 costs $5 and assigns probability 0.20 to each type. Pack 2 costs $2 and assigns probabilities 0.30, 0.30, 0.30, 0.05, 0.05 to A, B, C, D, E respectively.",
+          "style": "body"
+        },
+        {
+          "type": "p",
+          "text": "You may use sample(x, size, replace, prob). It returns size draws from x; replace controls replacement and prob supplies optional relative weights. Input checks and function documentation are not required.",
+          "style": "body"
+        },
+        {
+          "type": "p",
+          "text": "Functions may be inefficient; minor extra credit may reward efficiency.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "Write open_pack(pack_type), where pack_type is 1 or 2. Return a character vector of length one containing the sticker received.",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "blank",
+          "height": 320
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 6 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "Write open_packs(pack_type, n). Return a character vector containing the results of opening n packs of the chosen type. You may call open_pack, but are not required to do so.",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "blank",
+          "height": 420
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 6 (continued)"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "You have $40 and must buy only one pack type: eight Pack 1 packs or twenty Pack 2 packs. Write spend40(pack_type, reps) to estimate the percentage of runs that collect all five types. Use open_pack or open_packs. Compare the two choices and state which is better. The function unique may help.",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "p",
+          "text": "This uses the $40 budget explicitly corrected in the official solution note. Random estimates need not equal any particular numerical value.",
+          "style": "small"
+        },
+        {
+          "type": "blank",
+          "height": 360
+        }
+      ]
+    ],
+    "answers": [
+      [
+        {
+          "type": "h",
+          "text": "Problem 1"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 25: the retained values are 1, 3, 5, 7, 9.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 24: x %% 3 == 0 selects the third column, containing 7, 8, 9.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "     [,1] [,2]\n[1,]    2    2\n[2,]   12   12\n[3,]   30   30\n[4,]   56   56",
+          "blank": 0,
+          "qline": false,
+          "text": "Recycling proceeds down each matrix column: multiply 1,3,5,7 by 2,4,6,8.",
+          "lang": "text"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "c(1, 2, 3, 4, 0, 1, 2, 3, 4, 5)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 2. The grouped v values are 1 for y=2 and 2 for y=3; ascending order keeps y=2.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "q = 15. bar(5) calls baz(30), which returns 15. foo is not called.",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 2"
+        },
+        {
+          "type": "p",
+          "text": "One valid approach follows. Here the analysis requires known sex and age in e-f; NA values in numeric transformations remain NA.",
+          "style": "body"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "num <- vapply(mydata, is.numeric, logical(1))\nmydata[num] <- lapply(mydata[num], function(x) {\n  x[x < 0] <- NA\n  x\n})",
+          "blank": 0,
+          "qline": false,
+          "text": "Operate only on numeric columns, not character columns.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "mydata$mean_arterial_pressure <-\n  (2 * mydata$diastolic_bp + mydata$systolic_bp) / 3",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "mydata$smoking <- mydata$years_smoking > 0",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "mydata$female <- mydata$sex == \"Female\"\nmydata$female[mydata$sex == \"\"] <- NA",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "mydata <- mydata[which(mydata$female), , drop = FALSE]",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "keep <- !is.na(mydata$age) & mydata$age >= 18 & mydata$age <= 65\nmydata <- mydata[keep, , drop = FALSE]",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "",
+          "code": "lo <- min(mydata$outcome_score, na.rm = TRUE)\nhi <- max(mydata$outcome_score, na.rm = TRUE)\nmydata$outcome_score <- (mydata$outcome_score - lo) / (hi - lo)",
+          "blank": 0,
+          "qline": false,
+          "text": "Assume at least two distinct nonmissing values. The official unguarded min/max expressions need na.rm=TRUE when missing outcomes remain.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "h",
+          "prompt": "",
+          "code": "mod <- lm(outcome_score ~ factor(treatment) +\n            age * mean_arterial_pressure +\n            cholesterol + I(cholesterol^2) + I(cholesterol^3),\n          data = mydata)",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "i",
+          "prompt": "",
+          "code": "mean(predict(mod))",
+          "blank": 0,
+          "qline": false,
+          "text": "This averages predictions on the observations used by the fitted model.",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 3"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "noisyx <- x + rnorm(length(x))",
+          "blank": 0,
+          "qline": false,
+          "text": "rnorm(1) supplies a single shared random shift; it is not the constant 1.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "data$yearsempl <- data$yearsfull\ndata$yearsempl[data$isparttime] <-\n  data$yearspart[data$isparttime]",
+          "blank": 0,
+          "qline": false,
+          "text": "Subset both sides by the same part-time indicator.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "total <- 0\nfor (i in seq_along(data)) {\n  total <- total + data[i]\n}",
+          "blank": 0,
+          "qline": false,
+          "text": "Initialize the accumulator outside the loop. A different name also avoids hiding sum().",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "d",
+          "prompt": "",
+          "code": "cars %>%\n  group_by(manufacturer) %>%\n  summarize(meanmpg = mean(mpg), .groups = \"drop\")",
+          "blank": 0,
+          "qline": false,
+          "text": "The original code computes one overall mean because group_by is missing.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "e",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "Always TRUE: each ordinary data.frame column has the same number of rows.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "Always FALSE: replacing values above 50 by 50 can only decrease or preserve the mean, not increase it.",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "g",
+          "prompt": "",
+          "code": "",
+          "blank": 0,
+          "qline": false,
+          "text": "Depends. Equality is possible when every original row survives the rural filter and every state has one row; otherwise aggregation or filtering may reduce the row count.",
+          "lang": "r"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 4"
+        },
+        {
+          "type": "sub",
+          "text": "a"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "p",
+              "q",
+              "r",
+              "k"
+            ],
+            [
+              "3",
+              "5",
+              "1",
+              "2"
+            ],
+            [
+              "9",
+              "5",
+              "2",
+              "4"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "b"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "k",
+              "p2"
+            ],
+            [
+              "4",
+              "11"
+            ],
+            [
+              "1",
+              "8"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "c"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "r",
+              "pp"
+            ],
+            [
+              "1",
+              "9"
+            ],
+            [
+              "2",
+              "9"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "sub",
+          "text": "d"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "p",
+              "m"
+            ],
+            [
+              "6",
+              "10"
+            ],
+            [
+              "3",
+              "20"
+            ],
+            [
+              "9",
+              "40"
+            ],
+            [
+              "2",
+              "60"
+            ]
+          ],
+          "small": false
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 4 (continued)"
+        },
+        {
+          "type": "sub",
+          "text": "e"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "p",
+              "m"
+            ],
+            [
+              "6",
+              "10"
+            ],
+            [
+              "3",
+              "20"
+            ],
+            [
+              "9",
+              "40"
+            ],
+            [
+              "2",
+              "60"
+            ],
+            [
+              "NA",
+              "30"
+            ],
+            [
+              "NA",
+              "50"
+            ]
+          ],
+          "small": false
+        },
+        {
+          "type": "item",
+          "label": "f",
+          "prompt": "",
+          "code": "SELECT o.r, o.k, s.m AS sku_value\nFROM orders AS o\nLEFT JOIN sku_map AS s ON o.k = s.k\nORDER BY o.k DESC",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "sql"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 5"
+        },
+        {
+          "type": "p",
+          "text": "X means the pattern matches somewhere in the string, subject to any anchors. Each pattern is displayed as R string contents.",
+          "style": "body"
+        },
+        {
+          "type": "regex",
+          "strings": [
+            "alice@gmail.com",
+            "bob.smith@umich.edu",
+            "test123@yahoo.com",
+            "jane-doe@company.org",
+            "contact@123web.net",
+            "admin@mailserver.local",
+            "user99@gmail.com",
+            "info@college.edu",
+            "myorg@domain.co.uk",
+            "support@website.io"
+          ],
+          "patterns": [
+            "^[^@]+@.+\\\\..+",
+            "(org|com)",
+            "[0-9]{3}",
+            "\\\\.[a-z]+\\\\.[a-z]+$"
+          ],
+          "answer": [
+            [
+              true,
+              true,
+              false,
+              false
+            ],
+            [
+              true,
+              false,
+              false,
+              false
+            ],
+            [
+              true,
+              true,
+              true,
+              false
+            ],
+            [
+              true,
+              true,
+              false,
+              false
+            ],
+            [
+              true,
+              false,
+              true,
+              false
+            ],
+            [
+              true,
+              false,
+              false,
+              false
+            ],
+            [
+              true,
+              true,
+              false,
+              false
+            ],
+            [
+              true,
+              false,
+              false,
+              false
+            ],
+            [
+              true,
+              true,
+              false,
+              true
+            ],
+            [
+              true,
+              false,
+              false,
+              false
+            ]
+          ]
+        },
+        {
+          "type": "space",
+          "height": 14
+        },
+        {
+          "type": "p",
+          "text": "a matches all ten. b looks for org or com anywhere, so myorg@domain.co.uk qualifies through the local part myorg. c requires three consecutive digits, not merely any three digits. d matches two dotted alphabetic components at the end.",
+          "style": "body"
+        }
+      ],
+      [
+        {
+          "type": "h",
+          "text": "Problem 6"
+        },
+        {
+          "type": "item",
+          "label": "a",
+          "prompt": "",
+          "code": "open_pack <- function(pack_type) {\n  probs <- if (pack_type == 1) rep(0.2, 5) else\n    c(0.3, 0.3, 0.3, 0.05, 0.05)\n  sample(LETTERS[1:5], 1, replace = TRUE, prob = probs)\n}",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "b",
+          "prompt": "",
+          "code": "open_packs <- function(pack_type, n) {\n  probs <- if (pack_type == 1) rep(0.2, 5) else\n    c(0.3, 0.3, 0.3, 0.05, 0.05)\n  sample(LETTERS[1:5], n, replace = TRUE, prob = probs)\n}",
+          "blank": 0,
+          "qline": false,
+          "text": "",
+          "lang": "r"
+        },
+        {
+          "type": "item",
+          "label": "c",
+          "prompt": "",
+          "code": "spend40 <- function(pack_type, reps = 10000) {\n  n <- if (pack_type == 1) 8 else 20\n  draws <- matrix(open_packs(pack_type, n * reps), nrow = n)\n  complete <- apply(draws, 2, function(x) length(unique(x)) == 5)\n  100 * mean(complete)\n}\nset.seed(506)\nspend40(1)\nspend40(2)",
+          "blank": 0,
+          "qline": false,
+          "text": "Pack 2 performs better: estimates are roughly 32% versus 40%. Every column is one budget-sized experiment. The official code returns a fraction via mean(complete); multiplying by 100 makes the returned value a percentage as requested.",
+          "lang": "r"
+        }
+      ]
+    ]
+  }
+}
