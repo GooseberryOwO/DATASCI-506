@@ -1,0 +1,364 @@
+---
+title: "STATS 506 — Homework 4"
+author: "Yuze Jin"
+date: today
+format:
+  html:
+    embed-resources: true
+    code-fold: true
+    toc: true
+execute:
+  echo: true
+---
+
+Repository: [DATASCI-506](https://github.com/GooseberryOwO/DATASCI-506)
+
+Data sources: [course nzge file](https://phuongov.github.io/stats506-f26/data_f26/nzge.rds), [Jeff Sackmann's ATP data, supplied repository](https://github.com/azhou5849/tennis-atp-sackmann-data), and [The New York Times COVID-19 data](https://github.com/nytimes/covid-19-data/tree/master/rolling-averages). Population denominators come from the [Census Bureau's 2019 estimates](https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/nst-est2019-alldata.csv). Local copies were downloaded on November 9, 2026.
+
+OpenAI Codex assisted with debugging the code and writing explanations.
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+library(knitr)
+
+# Support running from either HW4 or the course repository in VS Code.
+data_dir <- "data"
+if (!file.exists(file.path(data_dir, "nzge.rds"))) {
+  data_dir <- file.path("HW4", "data")
+}
+```
+
+# Problem 1 — New Zealand
+
+Each row records votes at a voting place, rather than one individual vote. I therefore sum `votes` instead of counting rows. Candidate and Party votes are kept separate. The [nzge documentation](https://rdrr.io/cran/nzelect/man/nzge.html) explains these variables; the supplied RDS avoids installing the archived package.
+
+```{r}
+#| label: nz-import
+nzge <- read_rds(file.path(data_dir, "nzge.rds")) %>%
+  as_tibble()
+```
+
+## (a)
+
+```{r}
+#| label: nz-total-votes
+vote_totals <- nzge %>%
+  group_by(election_year, voting_type) %>%
+  summarize(votes = sum(votes), .groups = "drop") %>%
+  arrange(desc(votes))
+
+kable(vote_totals %>% mutate(election_year = as.character(election_year)),
+      col.names = c("Year", "Vote type", "Votes"),
+      format.args = list(big.mark = ","),
+      caption = "Total votes by year and type, in descending order")
+```
+
+## (b)
+
+```{r}
+#| label: nz-candidate-2014
+candidate_2014 <- nzge %>%
+  filter(election_year == 2014, voting_type == "Candidate") %>%
+  group_by(party) %>%
+  summarize(votes = sum(votes), .groups = "drop") %>%
+  mutate(proportion = votes / sum(votes), percent = 100 * proportion) %>%
+  arrange(desc(proportion))
+
+kable(candidate_2014, digits = c(0, 0, 4, 2),
+      col.names = c("Party or vote category", "Votes", "Proportion", "Percent"),
+      caption = "Party shares of the 2014 Candidate vote")
+```
+
+The denominator is all recorded Candidate votes in 2014, excluding Party votes. The data include `Informal Candidate Votes` in the `party` column; I retain it as a separate nonparty category, so the proportions include informal votes and sum to one. `r candidate_2014$party[1]` has the largest share, `r round(candidate_2014$percent[1], 2)`% of all recorded Candidate votes.
+
+## (c)
+
+```{r}
+#| label: nz-winning-parties
+winning_parties <- nzge %>%
+  group_by(election_year, voting_type, party) %>%
+  summarize(votes = sum(votes), .groups = "drop") %>%
+  group_by(election_year, voting_type) %>%
+  filter(votes == max(votes)) %>%
+  ungroup() %>%
+  select(election_year, voting_type, party) %>%
+  pivot_wider(names_from = voting_type, values_from = party) %>%
+  arrange(election_year)
+
+kable(winning_parties, col.names = c("Year", "Candidate", "Party"),
+      caption = "Party with the most votes in each election and vote type")
+```
+
+Labour leads both vote types in 2002. In 2005, National leads the Candidate vote while Labour leads the Party vote. National leads both in 2008, 2011, and 2014. Here, winning means the largest national vote total, rather than the most electorate seats.
+
+# Problem 2 — Tennis
+
+Each row is one match, with separate winner and loser columns. `tourney_id` identifies an event, `round == "F"` identifies a final, and `w_ace` and `l_ace` record aces in that match. All listed matches are used unless a question requires filtering.
+
+```{r}
+#| label: tennis-import
+tennis <- read_csv(file.path(data_dir, "atp_matches_2019.csv"),
+                   show_col_types = FALSE)
+```
+
+## (a)
+
+```{r}
+#| label: tennis-tournaments
+tournament_counts <- tennis %>%
+  summarize(matches = n(), events = n_distinct(tourney_id),
+            davis_cup_ids = n_distinct(tourney_id[tourney_level == "D"]),
+            events_with_finals = n_distinct(tourney_id[round == "F"]))
+
+kable(tournament_counts,
+      col.names = c("Matches", "Event IDs", "Davis Cup IDs", "Events with finals"),
+      caption = "Events represented in the 2019 match file")
+```
+
+There are **`r tournament_counts$events` distinct events** in the file. This counts `tourney_id`, not matches. The file includes `r tournament_counts$davis_cup_ids` Davis Cup tie IDs and a Laver Cup team event, so 128 should not be interpreted as 128 individual ATP title tournaments. There are `r tournament_counts$events_with_finals` events with an individual final; those are used to count titles below.
+
+## (b)
+
+```{r}
+#| label: tennis-repeat-champions
+title_counts <- tennis %>%
+  filter(round == "F") %>%
+  group_by(winner_id, winner_name) %>%
+  summarize(titles = n(), .groups = "drop") %>%
+  arrange(desc(titles), winner_name)
+
+multiple_champions <- title_counts %>%
+  filter(titles > 1)
+top_champions <- title_counts %>%
+  filter(titles == max(titles))
+
+kable(multiple_champions %>% select(winner_name, titles),
+      col.names = c("Player", "Titles"),
+      caption = "Players winning more than one tournament")
+```
+
+Yes. **`r nrow(multiple_champions)` players** won more than one tournament. `r paste(top_champions$winner_name, collapse = " and ")` tied for the most titles, with **`r max(title_counts$titles)` each**. Winning an ordinary match is not counted as winning a tournament.
+
+## (c)
+
+I compare winners and losers within the same match, retaining only matches with both ace counts observed. This gives descriptive evidence without a hypothesis test.
+
+```{r}
+#| label: tennis-aces
+ace_pairs <- tennis %>%
+  filter(!is.na(w_ace), !is.na(l_ace)) %>%
+  mutate(difference = w_ace - l_ace)
+
+ace_summary <- ace_pairs %>%
+  summarize(matches = n(),
+            mean_winner_aces = mean(w_ace),
+            mean_loser_aces = mean(l_ace),
+            mean_difference = mean(difference),
+            median_difference = median(difference))
+
+ace_comparison <- ace_pairs %>%
+  summarize(winner_more = sum(difference > 0),
+            equal = sum(difference == 0),
+            loser_more = sum(difference < 0)) %>%
+  pivot_longer(everything(), names_to = "comparison", values_to = "matches") %>%
+  mutate(percent = 100 * matches / sum(matches))
+
+kable(ace_summary, digits = 2, caption = "Aces in matched winner–loser pairs")
+kable(ace_comparison, digits = 2,
+      caption = "Which player served more aces in each match?")
+```
+
+Among `r ace_summary$matches` complete pairs, winners average `r round(ace_summary$mean_winner_aces, 2)` aces and losers average `r round(ace_summary$mean_loser_aces, 2)`, a mean difference of `r round(ace_summary$mean_difference, 2)`. Winners have more aces in `r round(100 * mean(ace_pairs$difference > 0), 1)`% of matches, compared with `r round(100 * mean(ace_pairs$difference < 0), 1)`% for losers; `r round(100 * mean(ace_pairs$difference == 0), 1)`% are ties. These summaries support a tendency for winners to serve more aces. They do not establish that aces cause winning or provide a formal significance test. The `r nrow(tennis) - nrow(ace_pairs)` incomplete pairs are excluded, and players appear repeatedly in the data.
+
+## (d)
+
+```{r}
+#| label: tennis-win-rates
+player_results <- bind_rows(
+  tennis %>% transmute(player_id = winner_id, player = winner_name, won = 1),
+  tennis %>% transmute(player_id = loser_id, player = loser_name, won = 0)
+)
+
+win_rates <- player_results %>%
+  group_by(player_id, player) %>%
+  summarize(matches = n(), wins = sum(won), .groups = "drop") %>%
+  mutate(win_rate = wins / matches) %>%
+  filter(matches >= 5) %>%
+  arrange(desc(win_rate))
+
+best_players <- win_rates %>%
+  filter(win_rate == max(win_rate))
+
+kable(best_players %>% select(player, matches, wins, win_rate), digits = 4,
+      col.names = c("Player", "Matches", "Wins", "Win rate"),
+      caption = "Highest win rate among players with at least five matches")
+```
+
+**`r paste(best_players$player, collapse = ", ")`** has the highest win rate: `r best_players$wins[1]` wins in `r best_players$matches[1]` matches, or **`r round(100 * best_players$win_rate[1], 2)`%**. The denominator counts both wins and losses, rather than only matches a player won.
+
+# Problem 3 — Visualization
+
+I analyze the 50 states, excluding DC and territories, from January 21, 2020 through March 23, 2023. The [NYT methodology](https://github.com/nytimes/covid-19-data/tree/master/rolling-averages#rolling-averages) defines `cases` as daily new reported cases and `cases_avg` as a seven-day average with adjustments for reporting anomalies. Per-capita figures use 2019 Census populations. Reported cases depend on testing and reporting, so the plots describe reported disease burden rather than all infections.
+
+```{r}
+#| label: covid-import
+covid <- read_csv(file.path(data_dir, "us-states.csv"),
+                  show_col_types = FALSE) %>%
+  filter(state %in% state.name) %>%
+  arrange(state, date)
+
+population <- read_csv(file.path(data_dir, "population_2019.csv"),
+                       show_col_types = FALSE) %>%
+  filter(NAME %in% state.name) %>%
+  select(state = NAME, population = POPESTIMATE2019)
+
+theme_set(theme_bw(base_size = 12) +
+            theme(panel.grid.minor = element_blank(),
+                  legend.position = "bottom",
+                  plot.title = element_text(face = "bold"),
+                  plot.caption = element_text(hjust = 0)))
+```
+
+## (a)
+
+I count broad waves separated by sustained declines, rather than every small local fluctuation. After visually identifying eight broad periods, I mark the highest seven-day average within each period. For a reproducible size distinction, I call a peak **major** if it reaches 100,000 daily cases across the 50 states, and **minor** otherwise. These are descriptive choices, not an official classification.
+
+```{r}
+#| label: covid-waves
+#| fig-width: 9.5
+#| fig-height: 5.5
+#| fig-cap: "Broad waves in reported cases across the 50 U.S. states. Points mark the maximum within each visually chosen period."
+national <- covid %>%
+  group_by(date) %>%
+  summarize(daily_average = sum(cases_avg), .groups = "drop") %>%
+  arrange(date)
+
+# cut() assigns each date to one of the visually chosen wave periods.
+wave_breaks <- as.Date(c("2020-01-20", "2020-06-01", "2020-10-01",
+                         "2021-03-01", "2021-06-15", "2021-11-01",
+                         "2022-04-01", "2022-10-15", "2023-03-24"))
+wave_peaks <- national %>%
+  mutate(wave = cut(date, breaks = wave_breaks, right = FALSE, labels = FALSE)) %>%
+  group_by(wave) %>%
+  filter(daily_average == max(daily_average)) %>%
+  ungroup() %>%
+  mutate(type = ifelse(daily_average >= 100000, "Major", "Minor"))
+
+wave_plot <- ggplot(national, aes(x = date, y = daily_average / 1000)) +
+  geom_line(color = "#174A6E", linewidth = 0.7) +
+  geom_hline(yintercept = 100, linetype = "dashed", color = "gray55") +
+  geom_point(data = wave_peaks, aes(color = type, shape = type), size = 2.7) +
+  geom_text(data = wave_peaks, aes(label = format(date, "%b %Y")),
+            nudge_y = 50, size = 3.2) +
+  scale_color_manual(values = c(Major = "#B24727", Minor = "#007B83")) +
+  scale_x_date(breaks = seq(as.Date("2020-01-01"), as.Date("2023-01-01"),
+                            by = "6 months"), date_labels = "%b %Y") +
+  scale_y_continuous(limits = c(0, NA)) +
+  labs(title = "Eight broad waves in reported COVID-19 cases",
+       subtitle = "Sum of NYT seven-day averages; dashed line = 100,000 cases/day",
+       x = NULL, y = "Daily new cases (thousands)", color = NULL, shape = NULL,
+       caption = "Source: The New York Times, January 2020–March 2023; 50 states.")
+wave_plot
+```
+
+Under this definition, there are **`r sum(wave_peaks$type == "Major")` major and `r sum(wave_peaks$type == "Minor")` minor waves**. The major peaks occur around January 2021, September 2021, January 2022, and July 2022. The smaller peaks occur around April 2020, July 2020, April 2021, and December 2022. January 2022 is by far the largest, at approximately `r format(round(max(wave_peaks$daily_average)), big.mark = ",")` reported cases per day. Shoulders within a broad wave, particularly in winter 2020–2021 and summer 2022, could be counted separately under a finer definition.
+
+## (b)
+
+I define the overall rate as the sum of daily new reported cases over the full period divided by the state's 2019 population, multiplied by 100,000. This counts reported cases, including possible reinfections, rather than the percentage of distinct residents infected. Negative daily corrections are retained in the total.
+
+```{r}
+#| label: covid-extreme-states
+#| fig-width: 9.5
+#| fig-height: 5.5
+#| fig-cap: "Daily reported case rates for the states with the highest and lowest cumulative rates, using a common vertical scale."
+state_rates <- covid %>%
+  group_by(state) %>%
+  summarize(total_cases = sum(cases), .groups = "drop") %>%
+  left_join(population, by = "state") %>%
+  mutate(cases_per_100k = 100000 * total_cases / population) %>%
+  arrange(desc(cases_per_100k))
+
+extreme_states <- state_rates %>%
+  filter(cases_per_100k == max(cases_per_100k) |
+           cases_per_100k == min(cases_per_100k))
+
+kable(extreme_states, digits = 1,
+      col.names = c("State", "Total reported cases", "2019 population", "Cases/100,000"),
+      caption = "Highest and lowest cumulative reported case rates")
+
+extreme_trajectory <- covid %>%
+  filter(state %in% extreme_states$state)
+
+extreme_plot <- ggplot(extreme_trajectory,
+                       aes(x = date, y = cases_avg_per_100k,
+                           color = state, linetype = state)) +
+  geom_line(linewidth = 0.75) +
+  scale_color_manual(values = c(Maryland = "#0072B2", "Rhode Island" = "#D55E00")) +
+  scale_x_date(date_breaks = "6 months", date_labels = "%b %Y") +
+  scale_y_continuous(limits = c(0, NA)) +
+  labs(title = "Rhode Island has the highest cumulative reported case rate",
+       subtitle = "Compared with Maryland, the lowest-rate state; seven-day averages",
+       x = NULL, y = "Daily new cases per 100,000 residents", color = NULL,
+       linetype = NULL,
+       caption = "Source: The New York Times; rates use 2019 Census populations.")
+extreme_plot
+```
+
+**Rhode Island** has the highest overall rate (`r format(round(extreme_states$cases_per_100k[extreme_states$state == "Rhode Island"]), big.mark = ",")` cases per 100,000), while **Maryland** has the lowest (`r format(round(extreme_states$cases_per_100k[extreme_states$state == "Maryland"]), big.mark = ",")`). Both have their largest surge in January 2022, but Rhode Island's peak is much higher. Rhode Island also has more pronounced waves in spring 2020 and winter 2020–2021. The difference is therefore spread across several waves, rather than arising only from the January 2022 peak. These comparisons alone cannot separate infection risk from differences in testing and reporting.
+
+## (c)
+
+For this exploratory comparison, I define a substantial outbreak as reaching **100 cumulative reported cases**, rather than the first isolated case. This is an absolute threshold, so it tends to be reached earlier in larger states; a population-based definition could give a different order. I calculate cumulative counts from daily `cases` and plot the early trajectories on a log scale so that the threshold crossings are visible.
+
+```{r}
+#| label: covid-first-five
+#| fig-width: 9.5
+#| fig-height: 5.5
+#| fig-cap: "Early cumulative case trajectories. Colored lines identify the first five states to reach 100 reported cases; gray lines show the other states."
+early_cases <- covid %>%
+  group_by(state) %>%
+  arrange(date, .by_group = TRUE) %>%
+  mutate(cumulative_cases = cumsum(cases)) %>%
+  ungroup() %>%
+  filter(date <= as.Date("2020-03-31"))
+
+onset_dates <- early_cases %>%
+  filter(cumulative_cases >= 100) %>%
+  group_by(state) %>%
+  summarize(first_100 = min(date), .groups = "drop") %>%
+  arrange(first_100, state)
+
+# No tie crosses the fifth-place boundary for this threshold.
+first_five <- onset_dates %>% head(5)
+crossings <- early_cases %>%
+  inner_join(first_five, by = "state") %>%
+  filter(date == first_100)
+
+kable(first_five, col.names = c("State", "First date with 100 cases"),
+      caption = "First five states reaching the exploratory outbreak threshold")
+
+onset_plot <- ggplot(early_cases %>% filter(cumulative_cases > 0),
+                     aes(x = date, y = cumulative_cases, group = state)) +
+  geom_line(color = "gray85", linewidth = 0.4) +
+  geom_line(data = early_cases %>%
+              filter(state %in% first_five$state, cumulative_cases > 0),
+            aes(color = state), linewidth = 0.85) +
+  geom_hline(yintercept = 100, linetype = "dashed", color = "gray35") +
+  geom_point(data = crossings, aes(color = state), size = 2.6) +
+  scale_color_manual(values = c(California = "#0072B2", Colorado = "#D55E00",
+                                 Massachusetts = "#009E73", "New York" = "#CC79A7",
+                                 Washington = "#7A5900")) +
+  scale_x_date(date_breaks = "2 weeks", date_labels = "%b %d") +
+  scale_y_log10(breaks = c(1, 10, 100, 1000, 10000, 100000),
+                labels = c("1", "10", "100", "1,000", "10,000", "100,000")) +
+  labs(title = "Five states reached 100 reported cases first",
+       subtitle = "Points mark threshold crossings; dashed line = 100 cases",
+       x = "2020", y = "Cumulative reported cases (log scale)", color = NULL,
+       caption = "Source: The New York Times; gray lines represent other states.")
+onset_plot
+```
+
+The first five are **California and Washington** (March 7), **New York** (March 8), **Massachusetts** (March 12), and **Colorado** (March 14). California and Washington tie at the daily resolution of the data. The highlighted curves cross the threshold before the other states, supporting this selection. The log scale makes proportional growth easier to compare; the spacing between 10 and 100 is the same as between 100 and 1,000. This is a description of when reported outbreaks became substantial under the stated definition, not when the first infections actually occurred.
